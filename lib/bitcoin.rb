@@ -45,11 +45,11 @@ module Bitcoin
     puts "version->"
 
     # get the version
-    message = socket.gets_message
+    message = socket.gets
     puts "<-#{message.type}"
 
     # get the verack
-    message = socket.gets_message
+    message = socket.gets
     puts "<-#{message.type}"
 
     # reply to verack
@@ -74,62 +74,59 @@ module Bitcoin
         super ip, port
       end
 
-      # Get a message from the wire (overwrite default gets method)
+      # Read binary message from the wire and return a message object
       def gets
-        # This custom grabbing something from the socket stream works!
-        # You could use gets with a custom separator though (nah, too tricky to get first version message)
-        magic_bytes = self.recv(4)
-        command_type = self.recv(12)
-        payload_size = self.recv(4)
-        payload_checksum = self.recv(4)
+        magic_bytes = self.read(4).unpack("H*").join # .read seems to be easier than the lower-level recv
+        raise "Magic Bytes Problem" if magic_bytes != "f9beb4d9"
 
-        # Return binary message
-        if payload_size.unpack("V").join.to_i > 0
-          payload = recv(payload_size.unpack("V").join.to_i) # get the payload if there is one
-          return magic_bytes + command_type + payload_size + payload_checksum + payload
-        else
-          return magic_bytes + command_type + payload_size + payload_checksum
+        command_type = self.read(12)
+        raise "Command Type Problem" if command_type.length != 12
+        command_type = command_type.to_s.delete("\x00")           # ascii string (remove hex literals)
+
+        payload_size = self.read(4)
+        raise "Payload Size Problem" if payload_size.length != 4
+        payload_size = payload_size.unpack("V").join.to_i         # V = 32-byte unsigned, little-endian
+
+        payload_checksum = self.read(4)
+        raise "Payload Checksum Problem" if payload_checksum.length != 4
+        payload_checksum = payload_checksum.unpack("H*").join
+
+        # get payload in one go (I think this works best)
+        # stackoverflow.com/questions/19037879/problems-receiving-large-amount-of-data-through-ruby-tcp-socket
+        payload = nil
+        if payload_size
+          payload = self.read(payload_size).unpack("H*").join
         end
-      end
 
-      def gets_message # Conveniently return a message object instead of just binary data
-        binary = gets # get a message (in binary)
-        return Message.from_binary(binary) # return a message object
+        # Create a message object
+        message = Bitcoin::Protocol::Message.new(command_type, payload)
+        return message
       end
 
     end
 
     class Message
-      attr_reader :type, :payload, :size, :checksum, :payload, :binary, :hex
+      attr_reader :type, :size, :checksum, :payload
 
       def initialize(type, payload=nil)
         @type = type
         @size = payload ? payload.length/2 : 0
-
-        # header
-        magic    = MAGIC_BYTES                                         # F9 BE B4 D9
-        command  = Utils.ascii2hex(type).ljust(24, '0')                # 76 65 72 73 69 6F 6E 00 00 00 00 00
-        size     = Utils.reversebytes((@size).to_s(16).rjust(8, '0'))  # 55 00 00 00
-        checksum = Utils.checksum(payload)                             # D6 A3 4B 77
-
         @checksum = checksum
-
         @payload = payload
-        @hex = payload ? magic+command+size+checksum+payload : magic+command+size+checksum
-        @binary = [@hex].pack("H*")
       end
 
-      def self.from_binary(binary)
-        data = StringIO.new(binary)
+      # Serialize this message data in to hexadecimal for the bitcoin network
+      def hex
+        magic    = MAGIC_BYTES                                         # F9 BE B4 D9
+        command  = Utils.ascii2hex(@type).ljust(24, '0')               # 76 65 72 73 69 6F 6E 00 00 00 00 00
+        size     = Utils.reversebytes((@size).to_s(16).rjust(8, '0'))  # 55 00 00 00
+        checksum = Utils.checksum(@payload)                            # D6 A3 4B 77
 
-        magic     = data.read(4).unpack("H*").join
-        type      = data.read(12).to_s.delete("\x00")  # ascii string (remove hex literals)
-        size      = data.read(4).unpack("V").join.to_i # V = 32-byte unsigned, little-endian
-        checksum  = data.read(4).unpack("H*").join
+        return @payload ? magic+command+size+checksum+@payload : magic+command+size+checksum
+      end
 
-        payload = size > 0 ? data.read(size).unpack("H*").join : nil
-
-        return Message.new(type, payload)
+      def binary
+        return [hex].pack("H*")
       end
 
       def self.version(version=70015, services=13, lastblock=0)
@@ -146,7 +143,7 @@ module Bitcoin
         payload += Time.now.to_i.to_s(16).rjust(16, '0').upcase.scan(/../).reverse.join(" ")       # unixtime
         payload += "01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 FF FF 2E 13 89 4A 20 8D" # remote address
         payload += "01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 FF FF 7F 00 00 01 20 8D" # local address
-        payload += Utils.reversebytes(rand(18446744073709551615).to_s(16)) # nonce
+        payload += Utils.reversebytes(Utils.field(rand(18446744073709551615).to_s(16), 4)) # nonce
         payload += "00" # sub-version string
         payload += Utils.reversebytes(Utils.field(lastblock.to_s(16), 4)) # last block we have
 
@@ -154,80 +151,5 @@ module Bitcoin
       end
 
     end
-
   end
 end
-
-
-
-def read_message(socket)
-  buffer = []
-
-  # Keep trying to read invididual bytes from the socket
-  while true
-    data = socket.recv(1)
-
-    # Got a byte
-    if data
-
-      buffer << data # Store bytes received from socket in temporary buffer
-
-      # Keep reading streams of 4 bytes until you hit Magic Bytes (start of new message)
-      if buffer.size == 4
-
-        # If first 4 bytes isn't magic, remove first byte and keep reading 4-byte streams to look for it
-        unless buffer.map {|byte| byte.unpack("H*").join} == ["f9", "be", "b4", "d9"]
-          buffer.shift
-        else
-          # Header
-          magic = buffer.join
-          command = socket.recv(12)
-          payload_size = socket.recv(4)
-          payload_checksum = socket.recv(4)
-
-          buffer = [] # Clear Buffer
-
-          # Payload
-          payload = ""
-          payloadhex = ""
-          payload_size.unpack("V").join.to_i.times do # Just read 1 until got all
-            byte = socket.recv(1)
-            payload << byte
-            payloadhex << byte.unpack("H*").join
-          end
-
-          # If the payload's checksum matches the checksum in header
-          if Utils.checksum(payloadhex) == payload_checksum.unpack("H*").join
-            return Bitcoin::Protocol::Message.from_binary(magic+command+payload_size+payload_checksum+payload)
-          else
-            raise "Checksum Err: #{command}, #{payload_checksum}, #{checksum(payload)}, #{payload_size}, #{payload}"
-          end
-
-        end
-      end
-    end
-  end
-end
-
-# def reversebytes(hex)
-#   return hex.to_s.scan(/../).reverse.join
-# end
-
-# def ascii2hex(ascii)
-#     hex = ascii.each_byte.map {|c| c.to_s(16) }.join
-#     return hex
-# end
-
-# def create_message(command, payload='')
-#   # "F9 BE B4 D9"                         # magic bytes
-#   # "76 65 72 73 69 6F 6E 00 00 00 00 00" # command name (e.g. version)
-#   # "55 00 00 00"                         # payload size
-#   # "D6 A3 4B 77"                         # payload checksum
-
-#   header  = "f9beb4d9"                                              # magic bytes
-#   header += ascii2hex(command).ljust(24, '0')                       # command name
-#   header += reversebytes((payload.length/2).to_s(16).rjust(8, '0')) # payload size
-#   header += checksum(payload)                                       # payload checksum
-
-#   return header + payload
-# end

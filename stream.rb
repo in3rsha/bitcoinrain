@@ -1,14 +1,16 @@
 require 'socket'
 require_relative 'lib/bitcoin.rb'
 
+puts "Connecting to internet!"
 # 0. Connect to bitcoin server port
 socket = Bitcoin.connect('46.19.137.74') # takes care of handshake
 
 # 1. Receive Messages
 loop do
 
-  message = socket.gets_message
-  puts "<-#{message.type}"
+  message = socket.gets
+  puts "<-#{message.type} (#{message.size})"
+  # puts message.payload
 
   # 2. Respond to pings (keeps connection alive)
   if message.type == 'ping' # 70696E670000000000000000
@@ -39,8 +41,11 @@ loop do
   if message.type == 'tx'
 
     # Decode tx to json
-    json = `decoderawtransaction #{message.payload}`
-    puts json
+    if message.payload.length < 6000 # FIX: Argument list too long - decoderawtransaction
+      json = `decoderawtransaction #{message.payload}`
+      # puts json
+    end
+
   end
 
   if message.type == 'block'
