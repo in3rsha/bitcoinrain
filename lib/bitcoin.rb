@@ -26,38 +26,12 @@ end
 
 module Bitcoin
 
-  # Quickly connect to the bitcoin network (take care of handshake as well)
+  # Quickly connect to the bitcoin network
   def self.connect(ip, port=8333)
     socket = Bitcoin::Protocol::Connection.new(ip, port)
     puts "Welcome to the Bitcoin Network: #{socket.inspect}"
 
-    # Take care of the handshake
-    self.handshake(socket)
-
     # Hand the socket over
-    return socket
-  end
-
-  def self.handshake(socket)
-    # send version
-    version = Bitcoin::Protocol::Message.version # create a version message to send
-    socket.write version.binary # Send binary across the wire
-    puts "version->"
-
-    # get the version
-    message = socket.gets
-    puts "<-#{message.type}"
-
-    # get the verack
-    message = socket.gets
-    puts "<-#{message.type}"
-
-    # reply to verack
-    verack = Bitcoin::Protocol::Message.new('verack') # "F9BEB4D9 76657261636b000000000000 00000000 5df6e0e2"
-    socket.write verack.binary
-    puts "verack->"
-
-    # Now hand the socket back
     return socket
   end
 
@@ -101,6 +75,27 @@ module Bitcoin
         # Create a message object
         message = Bitcoin::Protocol::Message.new(command_type, payload)
         return message
+      end
+
+      # Perform the handshake
+      def handshake
+        # send version
+        version = Bitcoin::Protocol::Message.version # create a version message to send
+        self.write version.binary # Send binary across the wire
+        puts "version->"
+
+        # get the version
+        message = gets
+        puts "<-#{message.type}"
+
+        # get the verack
+        message = gets
+        puts "<-#{message.type}"
+
+        # reply to verack
+        verack = Bitcoin::Protocol::Message.new('verack') # "F9BEB4D9 76657261636b000000000000 00000000 5df6e0e2"
+        write verack.binary
+        puts "verack->"
       end
 
     end

@@ -1,9 +1,14 @@
 require 'socket'
 require_relative 'lib/bitcoin.rb'
 
-puts "Connecting to internet!"
 # 0. Connect to bitcoin server port
-socket = Bitcoin.connect('46.19.137.74') # takes care of handshake
+puts "Connecting to internet!"
+socket = Bitcoin.connect('46.19.137.74')
+
+# Takes care of handshake
+puts "Performing the handshake..."
+socket.handshake
+puts "Handshake complete!"
 
 # 1. Receive Messages
 loop do
