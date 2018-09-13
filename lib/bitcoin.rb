@@ -26,14 +26,11 @@ end
 
 module Bitcoin
 
-  # Quickly connect to the bitcoin network
+  # Connect (convenience funtction)
   def self.connect(ip, port=8333)
-    socket = Bitcoin::Protocol::Connection.new(ip, port)
-    puts "Welcome to the Bitcoin Network: #{socket.inspect}"
-
-    # Hand the socket over
-    return socket
+    return Bitcoin::Protocol::Connection.new(ip, port)
   end
+
 
   module Protocol
 
@@ -50,6 +47,8 @@ module Bitcoin
 
       # Read binary message from the wire and return a message object
       def gets
+        # CAUTION!
+        # puts here will call .puts on this socket, so use $stdoup.puts instead
         magic_bytes = self.read(4).unpack("H*").join # .read seems to be easier than the lower-level recv
         raise "Magic Bytes Problem" if magic_bytes != "f9beb4d9"
 
@@ -77,25 +76,24 @@ module Bitcoin
         return message
       end
 
-      # Perform the handshake
       def handshake
-        # send version
+        # i. send version
         version = Bitcoin::Protocol::Message.version # create a version message to send
-        self.write version.binary # Send binary across the wire
-        puts "version->"
+        write version.binary # Send binary across the wire
+        $stdout.puts "version->" # .puts on its own will write to the socket, not STDOUT! (use STDOUT or $stdout)
 
-        # get the version
+        # # ii. get the version
         message = gets
-        puts "<-#{message.type}"
+        $stdout.puts "<-#{message.type}"
 
-        # get the verack
+        # # iii. get the verack
         message = gets
-        puts "<-#{message.type}"
+        $stdout.puts "<-#{message.type}"
 
-        # reply to verack
+        # # iv. reply to verack
         verack = Bitcoin::Protocol::Message.new('verack') # "F9BEB4D9 76657261636b000000000000 00000000 5df6e0e2"
         write verack.binary
-        puts "verack->"
+        $stdout.puts "verack->"
       end
 
     end
