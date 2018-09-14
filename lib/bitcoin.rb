@@ -48,26 +48,26 @@ module Bitcoin
       # Read binary message from the wire and return a message object
       def gets
         # Keep reading until you get 4 bytes of magic
-        # buffer = ""
-        # loop do
-        #   byte = self.recv(1)
-        #   byte = byte.unpack("H*").join
-        #   STDOUT.print byte
-        #   # buffer += byte
-        #   if buffer.size == 8
-        #     if buffer == "f9beb4d9"
-        #       # STDOUT.puts "GOT THE MAGIC"
-        #       buffer = "" # reset the buffer
-        #       break # Break Out!
-        #     else
-        #       STDOUT.puts "THAT AINT NO MAGIC: #{buffer}"
-        #       buffer = buffer[2..-1] # remove first 2 bytes and keep reading...
-        #     end
-        #   end
-        # end
+        buffer = ""
+        loop do
+          byte = self.recv(1)
+          byte = byte.unpack("H*").join
+          # STDOUT.print byte
+          buffer += byte
+          if buffer.size == 8
+            if buffer == "f9beb4d9"
+              # STDOUT.puts "GOT THE MAGIC"
+              buffer = "" # reset the buffer
+              break # Break Out!
+            else
+              STDOUT.puts "THAT AINT NO MAGIC: #{buffer}"
+              buffer = buffer[2..-1] # remove first 2 bytes and keep reading...
+            end
+          end
+        end
 
         # Just reading 4 bytes reliably would be fucking nice...
-        magic_bytes = self.recv(4, Socket::MSG_WAITALL) # make it wait for all 4 bytes using this flag!
+        # magic_bytes = self.recv(4, Socket::MSG_WAITALL) # make it wait for all 4 bytes using this flag!
 
         # MSG_OOB        process out-of-band data
         # MSG_PEEK       peek at incoming message
