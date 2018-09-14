@@ -7,25 +7,31 @@ socket = Bitcoin.connect('46.19.137.74')
 puts "Welcome to the Bitcoin Network: #{socket.inspect}"
 
 # 1. Handshake (also made convenience function `socket.handshake` if you like)
-socket.handshake
+# socket.handshake
+
 # i. send version
-# version = Bitcoin::Protocol::Message.version # create a version message to send
-# socket.write version.binary # Send binary across the wire
-# puts "version->"
+version = Bitcoin::Protocol::Message.version # create a version message to send
+socket.write version.binary # Send binary across the wire
+puts "version->"
 
-# # ii. get the version
-# message = socket.gets
-# puts "<-#{message.type}"
+# ii. get the version
+message = socket.gets
+puts "<-#{message.type}"
 
-# # iii. get the verack
-# message = socket.gets
-# puts "<-#{message.type}"
+# iii. get the verack
+message = socket.gets
+puts "<-#{message.type}"
 
-# # iv. reply to verack
-# verack = Bitcoin::Protocol::Message.new('verack') # "F9BEB4D9 76657261636b000000000000 00000000 5df6e0e2"
-# socket.write verack.binary
-# puts "verack->"
+# iv. reply to verack
+verack = Bitcoin::Protocol::Message.new('verack') # "F9BEB4D9 76657261636b000000000000 00000000 5df6e0e2"
+socket.write verack.binary
+puts "verack->"
 
+
+# 2. Create socket for clients
+# File.unlink('stream.sock') # delete socket file if it already exists (otherwise error)
+# clientsocket = UNIXServer.new('stream.sock')
+# clients = [] # hold clients in an array
 
 # 2. Receive Messages
 loop do

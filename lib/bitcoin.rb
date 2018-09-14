@@ -47,10 +47,64 @@ module Bitcoin
 
       # Read binary message from the wire and return a message object
       def gets
+        # Keep reading until you get 4 bytes of magic
+        # buffer = ""
+        # loop do
+        #   byte = self.recv(1)
+        #   byte = byte.unpack("H*").join
+        #   STDOUT.print byte
+        #   # buffer += byte
+        #   if buffer.size == 8
+        #     if buffer == "f9beb4d9"
+        #       # STDOUT.puts "GOT THE MAGIC"
+        #       buffer = "" # reset the buffer
+        #       break # Break Out!
+        #     else
+        #       STDOUT.puts "THAT AINT NO MAGIC: #{buffer}"
+        #       buffer = buffer[2..-1] # remove first 2 bytes and keep reading...
+        #     end
+        #   end
+        # end
+
+        # Just reading 4 bytes reliably would be fucking nice...
+        magic_bytes = self.recv(4, Socket::MSG_WAITALL) # make it wait for all 4 bytes using this flag!
+
+        # MSG_OOB        process out-of-band data
+        # MSG_PEEK       peek at incoming message
+        # MSG_WAITALL    wait for full request or error
+
+        # The MSG_OOB flag requests receipt of out-of-band data that would not be
+        # received in the normal data stream.  Some protocols place expedited data
+        # at the head of the normal data queue, and thus this flag cannot be used
+        # with such protocols.
+        # The MSG_PEEK flag causes the receive operation to
+        # return data from the beginning of the receive queue without removing that
+        # data from the queue.  Thus, a subsequent receive call will return the
+        # same data.
+        # The MSG_WAITALL flag requests that the operation block until
+        # the full request is satisfied.  However, the call may still return less
+        # data than requested if a signal is caught, an error or disconnect occurs,
+        # or the next data to be received is of a different type than that
+        # returned.
+
+        # https://stackoverflow.com/questions/1527895/where-are-msg-options-defined-for-ruby-sockets
+
+        # begin
+        #   magic_bytes = self.recv(4) # .read seems to be easier than the lower-level recv
+        #   STDOUT.puts magic_bytes.inspect
+        #   STDOUT.puts magic_bytes.class
+        #   STDOUT.puts magic_bytes.size
+        #   STDOUT.puts magic_bytes.unpack("H*").join
+        #   magic_bytes = magic_bytes.unpack("H*").join
+        #   raise "Magic Bytes Problem" if magic_bytes != "f9beb4d9"
+        # rescue
+        #   STDOUT.puts "Aint got no MAGIC, trying again..."
+        #   sleep 0.5
+        #   retry
+        # end
+
         # CAUTION!
         # puts here will call .puts on this socket, so use $stdoup.puts instead
-        magic_bytes = self.read(4).unpack("H*").join # .read seems to be easier than the lower-level recv
-        raise "Magic Bytes Problem" if magic_bytes != "f9beb4d9"
 
         command_type = self.read(12)
         raise "Command Type Problem" if command_type.length != 12
@@ -80,20 +134,20 @@ module Bitcoin
         # i. send version
         version = Bitcoin::Protocol::Message.version # create a version message to send
         write version.binary # Send binary across the wire
-        $stdout.puts "version->" # .puts on its own will write to the socket, not STDOUT! (use STDOUT or $stdout)
+        # $stdout.puts "version->" # .puts on its own will write to the socket, not STDOUT! (use STDOUT or $stdout)
 
         # # ii. get the version
         message = gets
-        $stdout.puts "<-#{message.type}"
+        # $stdout.puts "<-#{message.type}"
 
         # # iii. get the verack
         message = gets
-        $stdout.puts "<-#{message.type}"
+        # $stdout.puts "<-#{message.type}"
 
         # # iv. reply to verack
         verack = Bitcoin::Protocol::Message.new('verack') # "F9BEB4D9 76657261636b000000000000 00000000 5df6e0e2"
         write verack.binary
-        $stdout.puts "verack->"
+        # $stdout.puts "verack->"
       end
 
     end
