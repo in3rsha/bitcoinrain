@@ -106,8 +106,8 @@ loop do
   end
 
   # dummy blocks
-  if rand(10) == 8
-    json = '{"hash":"00000000000000000023f47aa216aa1664da0a838634ac13859c431c11360f11","version":536870912,"prevblock":"0000000000000000001f95d35034a87dab03a51ba9ba0b0c0d175fe16eaf1b83","merkleroot":"fe20a7dbd7d6d18cfbdf974d04b2674ca388426a1fd7f8ec11d7d72819716358","timestamp":1537743126,"bits":"17275a1f","nonce":1284452078,"txcount":2690,"size":1026958,"type":"block"}'
+  if rand(5) == 4
+    json = '{"hash":"00000000000000000023f47aa216aa1664da0a838634ac13859c431c11360f11","version":536870912,"prevblock":"0000000000000000001f95d35034a87dab03a51ba9ba0b0c0d175fe16eaf1b83","merkleroot":"fe20a7dbd7d6d18cfbdf974d04b2674ca388426a1fd7f8ec11d7d72819716358","timestamp":1537743126,"bits":"17275a1f","nonce":1284452078,"txcount":2690,"size":' + rand(1526958).to_s + ',"type":"block"}'
     puts "BLOCK!!!"
 
     # Write tx to every connected client

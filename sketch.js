@@ -2,6 +2,7 @@
 var balls_waiting = []; // this is global in scope (i.e. for the draw() loop)
 var balls = [];
 
+var blocks_waiting = [];
 var blocks = [];
 
 var sound;
@@ -9,8 +10,11 @@ var sound;
 // Transactions Per Second
 var count = 0;
 
-let next = 0;
-let interval = 500; // milliseconds between new balls
+let next_tx = 0;
+let interval_tx = 500; // milliseconds between new balls
+
+let next_block = 0;
+let interval_block = 1000; // milliseconds between new balls
 
 
 function preload() { // preload stuff (before setup() and all other p5 stuff)
@@ -205,7 +209,7 @@ function setup() {
 
         if (json.type == 'block') {
         	block = new Block(json);
-        	blocks.push(block);
+        	blocks_waiting.push(block);
         }
     };
 
@@ -228,26 +232,26 @@ function draw() {
     text(tps + " tx/s", width/2, (height/2)+36);   // p5js time since program started
 
     // Regulate the interval of adding balls if the number of waiting balls starts to back up
-    if (balls_waiting.length <= 10) { interval = 500; }
-    if (balls_waiting.length > 20)  { interval = 450; }
-    if (balls_waiting.length > 30)  { interval = 400; }
-    if (balls_waiting.length > 40)  { interval = 350; }
-    if (balls_waiting.length > 50)  { interval = 300; }
-    if (balls_waiting.length > 60)  { interval = 250; }
-    if (balls_waiting.length > 70)  { interval = 200; }
-    if (balls_waiting.length > 80)  { interval = 150; }
-    if (balls_waiting.length > 90)  { interval = 100; }
-    if (balls_waiting.length > 100)  { interval = 50; }
+    if (balls_waiting.length <= 10) { interval_tx = 500; }
+    if (balls_waiting.length > 20)  { interval_tx = 450; }
+    if (balls_waiting.length > 30)  { interval_tx = 400; }
+    if (balls_waiting.length > 40)  { interval_tx = 350; }
+    if (balls_waiting.length > 50)  { interval_tx = 300; }
+    if (balls_waiting.length > 60)  { interval_tx = 250; }
+    if (balls_waiting.length > 70)  { interval_tx = 200; }
+    if (balls_waiting.length > 80)  { interval_tx = 150; }
+    if (balls_waiting.length > 90)  { interval_tx = 100; }
+    if (balls_waiting.length > 100)  { interval_tx = 50; }
 
 		// Transactions Regulator
-    if (millis() > next) { // millis() = time since program started
+    if (millis() > next_tx) { // millis() = time since program started
         // Add a ball to live balls only if we have one
         if (balls_waiting.length > 0) {
             a = balls_waiting.shift(); // get the first one
             balls.push(a); // add it to end of live balls
         }
         // set the time the next ball can be added
-        next += interval;
+        next_tx += interval_tx;
     }
 
 		// Transactions
@@ -267,6 +271,17 @@ function draw() {
             }
 
         }
+    }
+
+    // Blocks Regulator
+    if (millis() > next_block) { // millis() = time since program started
+        // Add a ball to live balls only if we have one
+        if (blocks_waiting.length > 0) {
+            a = blocks_waiting.shift(); // get the first one
+            blocks.push(a); // add it to end of live balls
+        }
+        // set the time the next ball can be added
+        next_block += interval_block;
     }
 
     // Blocks
@@ -294,8 +309,14 @@ function draw() {
 
     text(balls_waiting.length, 48, 40);
     text(balls.length, 48, 64);
-    text(interval, 48, 100);
-    text(count, 48, 140);
+    text(interval_tx, 48, 88);
+    text(next_tx, 48, 112);
+    text(count, 48, 142);
+
+    text(blocks_waiting.length, 48, 180);
+    text(blocks.length, 48, 204);
+    text(interval_block, 48, 228);
+    text(next_block, 48, 252);
 
     // text(millis() + " ms", windowWidth-100, 40);   // p5js time since program started
     // text(frameCount + " frames", windowWidth-100, 80); // p5js frames since program started
