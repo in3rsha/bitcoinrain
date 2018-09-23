@@ -1,6 +1,6 @@
 // [x] create a list (array) of transaction objects
-var balls = []; // this is global in scope (i.e. for the draw() loop)
-var live_balls = [];
+var balls_waiting = []; // this is global in scope (i.e. for the draw() loop)
+var balls = [];
 
 var blocks = [];
 
@@ -197,7 +197,7 @@ function setup() {
         		// [x] Create a new transaction object (just a circle), pass it data
         		ball = new Ball(json);
         		// [x] 3. Add transaction to waiting list
-        		balls.push(ball);
+        		balls_waiting.push(ball);
         	}
         	// tx/s
         	count += 1;
@@ -228,42 +228,42 @@ function draw() {
     text(tps + " tx/s", width/2, (height/2)+36);   // p5js time since program started
 
     // Regulate the interval of adding balls if the number of waiting balls starts to back up
-    if (balls.length <= 10) { interval = 500; }
-    if (balls.length > 20)  { interval = 450; }
-    if (balls.length > 30)  { interval = 400; }
-    if (balls.length > 40)  { interval = 350; }
-    if (balls.length > 50)  { interval = 300; }
-    if (balls.length > 60)  { interval = 250; }
-    if (balls.length > 70)  { interval = 200; }
-    if (balls.length > 80)  { interval = 150; }
-    if (balls.length > 90)  { interval = 100; }
-    if (balls.length > 100)  { interval = 50; }
+    if (balls_waiting.length <= 10) { interval = 500; }
+    if (balls_waiting.length > 20)  { interval = 450; }
+    if (balls_waiting.length > 30)  { interval = 400; }
+    if (balls_waiting.length > 40)  { interval = 350; }
+    if (balls_waiting.length > 50)  { interval = 300; }
+    if (balls_waiting.length > 60)  { interval = 250; }
+    if (balls_waiting.length > 70)  { interval = 200; }
+    if (balls_waiting.length > 80)  { interval = 150; }
+    if (balls_waiting.length > 90)  { interval = 100; }
+    if (balls_waiting.length > 100)  { interval = 50; }
 
 		// Transactions Regulator
     if (millis() > next) { // millis() = time since program started
         // Add a ball to live balls only if we have one
-        if (balls.length > 0) {
-            a = balls.shift(); // get the first one
-            live_balls.push(a); // add it to end of live balls
+        if (balls_waiting.length > 0) {
+            a = balls_waiting.shift(); // get the first one
+            balls.push(a); // add it to end of live balls
         }
-
-        next += interval; // set the time the next ball can be added
+        // set the time the next ball can be added
+        next += interval;
     }
 
 		// Transactions
-    if (live_balls.length > 0) { // Display and update live balls if there are any
+    if (balls.length > 0) { // Display and update live balls if there are any
         // [x] Constantly draw .show each ball in array
-        for (i=0; i<live_balls.length; i++) {
-            live_balls[i].show();
+        for (i=0; i<balls.length; i++) {
+            balls[i].show();
         }
 
         // [x] Constantly .update each ball in array
-        for (i=0; i<live_balls.length; i++) {
-            live_balls[i].update();
+        for (i=0; i<balls.length; i++) {
+            balls[i].update();
 
             // [x] Remove ball from array if runs below bottom of window
-            if (live_balls[i].y > windowHeight+100) {
-                live_balls.splice(i, 1);
+            if (balls[i].y > windowHeight+100) {
+                balls.splice(i, 1);
             }
 
         }
@@ -292,8 +292,8 @@ function draw() {
     textSize(16);
     textAlign(CENTER);
 
-    text(balls.length, 48, 40);
-    text(live_balls.length, 48, 64);
+    text(balls_waiting.length, 48, 40);
+    text(balls.length, 48, 64);
     text(interval, 48, 100);
     text(count, 48, 140);
 
