@@ -191,7 +191,7 @@ function setup() {
     createCanvas(width, height);
 
     // Attach callback function to websocket event in the setup...
-    var ws = new WebSocket("ws://localhost:8080");
+    var ws = new WebSocket("ws://85.119.83.25:8080");
     ws.onmessage = function(s) { // s contains everything about the message
 
         // [x] parse json data
