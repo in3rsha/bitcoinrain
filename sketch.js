@@ -140,6 +140,7 @@ function Block(data) {
 		// bounce
     this.elasticity = 0.6 + randomGaussian(0.0, 0.05); // add some noise
     this.bounce = 0; // bounce count
+    this.chained = false; // switch to indicate if a block has hit the stack yet
 
     // color
     this.r = 100;
@@ -163,18 +164,19 @@ function Block(data) {
         }
     }
 
+    this.stop = height;
+
     this.update = function() {
         // drop
         this.velocity += this.gravity;
         this.y += this.velocity;
 
         // bounce
-        if (this.y > windowHeight - this.d) {
-            if (this.bounce < 1) { // number of bounces to do
-                this.y = windowHeight - this.d; // blocks are drawn from the top left corner, so no need to half it
-                this.velocity = - (this.velocity * this.elasticity);
-                this.bounce += 1; // add to bounce count
-            }
+        if (this.y > this.stop - this.d) {
+          //this.y = this.stop - this.d;
+          //this.velocity = 0; // blocks are drawn from the top left corner, so no need to half it
+          //this.gravity = 0;
+          this.chained = true;
         }
 
     }
@@ -231,6 +233,44 @@ function draw() {
     textSize(24);
     text(tps + " tx/s", width/2, (height/2)+36);   // p5js time since program started
 
+
+    // Blocks Regulator
+    if (millis() > next_block) { // millis() = time since program started
+        // Add a ball to live balls only if we have one
+        if (blocks_waiting.length > 0) {
+            a = blocks_waiting.shift(); // get the first one
+            blocks.push(a); // add it to end of live balls
+        }
+        // set the time the next ball can be added
+        next_block += interval_block;
+    }
+
+    // Blocks
+    // Constantly .show each block in array
+    for (i=0; i<blocks.length; i++) {
+        blocks[i].show();
+    }
+
+    // Constantly .update each block in array
+    for (i=0; i<blocks.length; i++) {
+      // stacking
+      // if (i == 0) {
+      //   blocks[i].update();
+      // } else {
+      //   blocks[i].stop = blocks[i-1].y; // set the stopping point
+      //   blocks[i].update(); // stack block on top of previous one's y position
+      // }
+
+      // drop
+      blocks[i].update();
+      // [x] Remove ball from array if runs below bottom of window
+      if (blocks[i].y > windowHeight+100) {
+          blocks.splice(i, 1);
+      }
+
+    }
+
+
     // Regulate the interval of adding balls if the number of waiting balls starts to back up
     if (balls_waiting.length <= 10) { interval_tx = 500; }
     if (balls_waiting.length > 20)  { interval_tx = 450; }
@@ -271,34 +311,6 @@ function draw() {
             }
 
         }
-    }
-
-    // Blocks Regulator
-    if (millis() > next_block) { // millis() = time since program started
-        // Add a ball to live balls only if we have one
-        if (blocks_waiting.length > 0) {
-            a = blocks_waiting.shift(); // get the first one
-            blocks.push(a); // add it to end of live balls
-        }
-        // set the time the next ball can be added
-        next_block += interval_block;
-    }
-
-    // Blocks
-    // Constantly .show each block in array
-    for (i=0; i<blocks.length; i++) {
-        blocks[i].show();
-    }
-
-    // Constantly .update each block in array
-    for (i=0; i<blocks.length; i++) {
-        blocks[i].update();
-
-        // Remove block from array if runs below bottom of window
-        if (blocks[i].y > windowHeight+100) {
-            blocks.splice(i, 1);
-        }
-
     }
 
 
