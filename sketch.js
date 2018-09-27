@@ -10,6 +10,9 @@ var sound;
 // Transactions Per Second
 var count = 0;
 
+// Meters
+var total_value = 0;
+
 let next_tx = 0;
 let interval_tx = 500; // milliseconds between new balls
 
@@ -35,6 +38,7 @@ function Ball(data) {
     this.d = map(data.value, 0, 20000000000, 10, 160, true) // 200 btc max
 
     // value
+    this.value = data.value;
     this.btc = (data.value/100000000).toFixed(2); // 2 decimal places
 
     // drop
@@ -205,8 +209,14 @@ function setup() {
         		// [x] 3. Add transaction to waiting list
         		balls_waiting.push(ball);
         	}
+
         	// tx/s
         	count += 1;
+
+          // Add to meters while away (instead of adding after ball is dropped below window)
+          if (!focused) {
+            total_value += json.value;
+          }
         }
 
         if (json.type == 'block') {
@@ -306,7 +316,11 @@ function draw() {
             balls[i].update();
 
             // [x] Remove ball from array if runs below bottom of window
-            if (balls[i].y > windowHeight+100) {
+            if (balls[i].y > windowHeight + (balls[i].d/2)) {
+                // Add it's value to the counter
+                total_value = total_value + balls[i].value;
+
+                // Remove ball
                 balls.splice(i, 1);
             }
 
@@ -329,6 +343,13 @@ function draw() {
     text(blocks.length, 48, 204);
     text(interval_block, 48, 228);
     text(next_block, 48, 252);
+
+    // btc/s
+    fill(37);
+    total_btc = total_value / 100000000;
+    btc_per_s = (total_btc / (millis() / 1000)).toFixed(2);
+    textSize(22);
+    text(btc_per_s + " btc/s", width/2, height-16);
 
     // text(millis() + " ms", windowWidth-100, 40);   // p5js time since program started
     // text(frameCount + " frames", windowWidth-100, 80); // p5js frames since program started
