@@ -305,10 +305,15 @@ function draw() {
 // Toggle Mempool
 var togglemempool = false;
 
-function mousePressed() {
+function touchStarted() { // touch for mobiles (will use mousePressed instead if this is not defined)
     togglemempool = !togglemempool;
     mempool.velocity = 4;
 }
+
+// function mousePressed() {
+//     togglemempool = !togglemempool;
+//     mempool.velocity = 4;
+// }
 
 function mouseWheel(event) {
   if (event.delta > 0) {
