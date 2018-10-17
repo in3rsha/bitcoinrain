@@ -42,7 +42,8 @@ function setup() {
     var height = windowHeight;
 
     // Canvas
-    createCanvas(width, height);
+    var myCanvas = createCanvas(width, height);
+    myCanvas.parent('sketch'); // show the sketch in a specific div
 
     // Font
     textFont(myFont);

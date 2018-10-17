@@ -17,6 +17,26 @@
     <script src="Block.js"></script>
     <script src="sketch.js"></script>
 
+    <style type="text/css">
+    body {font-family: Sans;}
+
+    #warning-message {display: none; margin:8px; font-size:36px;}
+    @media only screen and (orientation:portrait){
+        #sketch { display:none; }
+        #warning-message { display:block; }
+    }
+    @media only screen and (orientation:landscape){
+        #warning-message { display:none; }
+    }
+    </style>
+
   </head>
 
+  <body>
+    <div id="sketch"></div>
+
+    <div id="warning-message">
+        This website works best in landscape mode. Rotate that slick device of yours and reload the page.
+    </div>
+  </body>
 </html>
