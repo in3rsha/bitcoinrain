@@ -15,4 +15,4 @@ def getprices
   end
 end
 
-puts getprices()
+# puts getprices()

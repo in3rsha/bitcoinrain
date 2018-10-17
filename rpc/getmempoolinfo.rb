@@ -26,4 +26,6 @@ def getmempoolinfo
   end
 end
 
+# puts getmempoolinfo()
+
 # [ ] Get mempool count from a remote RPC call to my node...

@@ -167,10 +167,21 @@ function Ball(data) {
           fill(this.r, this.g, this.b, (255/100) * 25 ); // change opacity to a percentage
           ellipse(this.x, this.d/2, this.d, this.d);
 
-          textSize(14);
-          fill(0);
           textAlign(CENTER);
-          text(-this.y.toFixed(0) + " px", this.x, this.d + 20)
+          // Store the world record bounce height!
+          if (-this.y > bounce_record) {
+            bounce_record = -this.y;
+            fill(255, 215, 0); // gold color if we're breaking the bounce record
+            textSize(13);
+            text("New Record!", this.x, this.d + 36);
+          } else {
+            fill(0); // black otherwise
+          }
+
+          // Display the bounce height
+          textSize(14);
+          text(-this.y.toFixed(0) + " px", this.x, this.d + 20); // -this.y because above sceen is a minus number, so make it positive
+
         }
 
     }

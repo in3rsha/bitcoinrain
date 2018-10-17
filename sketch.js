@@ -7,6 +7,9 @@ var tx_total_size = 0;
 var tx_count = 0;
 var block_count = 0;
 
+// Record!
+var bounce_record = 0;
+
 // Regulation
 var balls_waiting = []; // this is global in scope (i.e. for the draw() loop)
 var balls = [];
