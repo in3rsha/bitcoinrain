@@ -1,201 +1,57 @@
-// [x] create a list (array) of transaction objects
-var balls_waiting = []; // this is global in scope (i.e. for the draw() loop)
-var balls = [];
-
-var blocks_waiting = [];
-var blocks = [];
-
-var sound;
-
-// Transactions Per Second
-var count = 0;
+// config
+var websocket_uri = "ws://85.119.83.25:8080"; // Connect to the websocket that proviedes a stream of tx, block, and mempool data
 
 // Meters
-var total_value = 0;
+var tx_total_value = 0;
+var tx_total_size = 0;
+var tx_count = 0;
+var block_count = 0;
 
+// Regulation
+var balls_waiting = []; // this is global in scope (i.e. for the draw() loop)
+var balls = [];
 let next_tx = 0;
 let interval_tx = 500; // milliseconds between new balls
 
+var blocks_waiting = [];
+var blocks = [];
 let next_block = 0;
-let interval_block = 1000; // milliseconds between new balls
+let interval_block = 1000; // milliseconds between new blocks
 
+// BTC Prices
+var price = {};
+var currency_select = 1;
+var price_array = [];
+var currency_array = []; // match indexes with price_array - [ ] can do better than having 2 separate arrays for this
+var currency_color = 151;
+
+// Sound
+var sound;
 
 function preload() { // preload stuff (before setup() and all other p5 stuff)
-    sound = loadSound("droplet.mp3");
-    sound.rate(1); // change speed and pitch of the sound
+    // Sound
+    // sound = loadSound("droplet.mp3");
+    // sound.rate(1); // change speed and pitch of the sound
+
+    // Font
+    myFont = loadFont('assets/whitrabt.ttf');
 }
-
-// Ball Object
-function Ball(data) {
-    // console.log(data);
-    // console.log(data.value);
-
-    // position
-    this.x = random(windowWidth);
-    this.y = random(0);
-
-    // diameter (map to size based on its value)
-    this.d = map(data.value, 0, 20000000000, 10, 160, true) // 200 btc max
-
-    // value
-    this.value = data.value;
-    this.btc = (data.value/100000000).toFixed(2); // 2 decimal places
-
-    // drop
-    this.velocity = 0;
-    this.gravity  = 0.25;
-
-    // bounce - this is a function of the amount moved to tx size (in bytes)
-    this.bounce_coefficient = data.value/data.size; // multiple of amount moved to size (in bytes)
-    this.bounce_coefficient_mapped = map(this.bounce_coefficient, 0, 8000000, 0.2, 0.6, true); // multiple of 8000000 gives max bounce (e.g. ~24btc/256b)
-    this.bounce_coefficient_mapped_variable = this.bounce_coefficient_mapped + randomGaussian(-0.00, 0.05); // a nice deviation from it's actual bounce
-
-    this.elasticity = this.bounce_coefficient_mapped_variable; // [x] bounce height determined by size to value (big value, small size is bounciest)
-    this.bounce = 0; // bounce count
-
-    // color
-    this.r = random(255);
-    this.g = random(255);
-    this.b = random(255);
-
-    if (this.d > 0)   { [this.r, this.g, this.b] = [0, 124, 255]; }
-    if (this.d > 24)  { [this.r, this.g, this.b] = [69, 0, 234]; }
-    if (this.d > 48)  { [this.r, this.g, this.b] = [87, 0, 158]; }
-    if (this.d > 62)  { [this.r, this.g, this.b] = [179, 0, 0]; }
-    if (this.d > 86) { [this.r, this.g, this.b] = [255, 99, 0]; }
-    if (this.d > 110) { [this.r, this.g, this.b] = [255, 236, 0]; }
-    if (this.d > 134) { [this.r, this.g, this.b] = [40, 255, 0]; }
-
-    // D  = 0   124 255 #007cff
-    // E  = 69    0 234 #4500ea
-    // F  = 87    0 158 #58009e
-    // G  = 179   0   0 #b30000
-    // A  = 255  99   0 #ff6300
-    // Bb = 255 236   0 #ffec00
-    // C  =  40 255   0 #28ff00
-
-
-    // [ ] makes noise at a frequency based on color when hits bottom
-    this.show = function() {
-        // [x] color is based on value (using D-minor colours over ~2 octaves for set ranges of tx values)
-        noStroke();
-        fill(this.r, this.g, this.b);
-
-        ellipse(this.x, this.y, this.d, this.d);
-
-        // ...only if it's big enough
-        // [x] put value inside ball
-        if (this.btc > 10) {
-            fill(255);
-            textSize(13);
-            textAlign(CENTER);
-
-            text(this.btc, this.x, this.y+5)
-        }
-
-        // text(data.size, this.x, this.y-60);
-        // text(data.value, this.x, this.y-40);
-        // text(this.bounce_co, this.x, this.y-40);
-        // text(this.bounce_co_mapped, this.x, this.y-60);
-        // text(this.elasticity, this.x, this.y+40);
-
-
-
-    }
-
-    this.update = function() {
-        // this.y += 2;
-
-        // drop
-        this.velocity += this.gravity;
-        this.y += this.velocity;
-
-        // [x] bounce
-        if (this.y > windowHeight - (this.d/2)) {
-            if (this.bounce < 1) { // number of bounces to do
-                this.y = windowHeight - (this.d/2);
-                this.velocity = - (this.velocity * this.elasticity);
-                this.bounce += 1; // add to bounce count
-
-                // play sound! (loaded in preload)
-                // sound.play(); // makes animation slow down a lot with lots of balls
-            }
-        }
-
-    }
-
-}
-
-
-// Block Object
-function Block(data) {
-
-		// diameter
-    this.d = map(data.size, 0, 2000000, 10, 280, true) // 2MB
-
-    // position
-    this.x = width/2 - this.d/2; // center the block
-    this.y = 0;
-
-    // drop
-    this.velocity = 0;
-    this.gravity  = 0.25;
-
-		// bounce
-    this.elasticity = 0.6 + randomGaussian(0.0, 0.05); // add some noise
-    this.bounce = 0; // bounce count
-    this.chained = false; // switch to indicate if a block has hit the stack yet
-
-    // color
-    this.r = 100;
-    this.g = 100;
-    this.b = 100;
-
-    this.show = function() {
-    		strokeWeight(4);
-				stroke(0);
-        fill(this.r);
-        rect(this.x, this.y, this.d, this.d);
-
-        if (data.size > 10000) {
-            fill(0);
-            textSize(15);
-            noStroke();
-            textAlign(CENTER);
-
-						sizemb = (data.size/1000/1000).toFixed(2);
-            text(sizemb + " MB", this.x + this.d/2, this.y + this.d/2)
-        }
-    }
-
-    this.stop = height;
-
-    this.update = function() {
-        // drop
-        this.velocity += this.gravity;
-        this.y += this.velocity;
-
-        // bounce
-        if (this.y > this.stop - this.d) {
-          //this.y = this.stop - this.d;
-          //this.velocity = 0; // blocks are drawn from the top left corner, so no need to half it
-          //this.gravity = 0;
-          this.chained = true;
-        }
-
-    }
-
-}
-
 
 function setup() {
     var width = windowWidth;
     var height = windowHeight;
 
+    // Canvas
     createCanvas(width, height);
 
+    // Font
+    textFont(myFont);
+
+    // Create Mempool area
+    mempool = new Mempool();
+
     // Attach callback function to websocket event in the setup...
-    var ws = new WebSocket("ws://85.119.83.25:8080");
+    var ws = new WebSocket(websocket_uri);
     ws.onmessage = function(s) { // s contains everything about the message
 
         // [x] parse json data
@@ -208,20 +64,59 @@ function setup() {
         		ball = new Ball(json);
         		// [x] 3. Add transaction to waiting list
         		balls_waiting.push(ball);
-        	}
 
-        	// tx/s
-        	count += 1;
+            //console.log(json);
+        	}
 
           // Add to meters while away (instead of adding after ball is dropped below window)
           if (!focused) {
-            total_value += json.value;
+            tx_total_value += json.value;
+            tx_total_size += json.size;
+            mempool.count += 1; // mempool object count
+            mempool.size += json.size; // mempool object count
+
+            // tx/s
+          	tx_count += 1;
           }
         }
 
         if (json.type == 'block') {
-        	block = new Block(json);
-        	blocks_waiting.push(block);
+          if (focused) {
+        	   block = new Block(json);
+        	   blocks_waiting.push(block);
+          }
+
+          // Add to meters while away
+          if (!focused) {
+          	block_count += 1; // tx/s
+          }
+        }
+
+        if (json.type == 'mempool') {
+        	mempool.count = json.count;
+          mempool.size  = json.size;
+        }
+
+        if (json.type == 'prices') {
+          price = json;
+          // console.log(price.USD);
+
+          // Arrays of prices [ ] Must be a better way than having 2 separate arrays (one for the currency name)
+          price_array[0] = 1; // ["BTC", 1];
+          price_array[1] = price.USD; // ["USD", price.USD];
+          price_array[2] = price.GBP; // ["GBP", price.GBP];
+          price_array[3] = price.EUR; // ["GBP", price.GBP];
+          price_array[4] = price.JPY; // ["GBP", price.GBP];
+          price_array[5] = price.CNY; // ["GBP", price.GBP];
+          price_array[6] = price.CHF; // ["GBP", price.GBP];
+
+          currency_array[0] = "BTC"; // ["BTC", 1];
+          currency_array[1] = "USD"; // ["USD", price.USD];
+          currency_array[2] = "GBP"; // ["GBP", price.GBP];
+          currency_array[3] = "EUR"; // ["GBP", price.GBP];
+          currency_array[4] = "JPY"; // ["GBP", price.GBP];
+          currency_array[5] = "CNY"; // ["GBP", price.GBP];
+          currency_array[6] = "CHF"; // ["GBP", price.GBP];
         }
     };
 
@@ -229,22 +124,126 @@ function setup() {
 
 function draw() {
     // Redraw background constantly
-    background(51);
+    background(55); // Single Color Hue website background = 46
 
     // Logo
     noStroke();
-    fill(31);
+    fill(21);
     textSize(56);
     textAlign(CENTER);
     text("bitcoinrain", width/2, height/2);
 
     // tx/s
-    tps = (count / (millis() / 1000)).toFixed(1);
-    textSize(24);
+    tps = (tx_count / (millis() / 1000)).toFixed(1);
+    textSize(26);
     text(tps + " tx/s", width/2, (height/2)+36);   // p5js time since program started
 
+    // btc/s
+    fill(currency_color);
+    textSize(22);
+    textAlign(RIGHT);
+    //total_btc = (tx_total_value / 100000000);
+    //btc_per_s = (total_btc / (millis() / 1000)).toFixed(2);
+    //text(btc_per_s + " BTC/s", width - 10, mempool.y - 10);
 
-    // Blocks Regulator
+    //total_usd = total_btc * price.USD;
+    //usd_per_s = (total_usd / (millis() / 1000)).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'); // .replace code adds commas
+
+    // price_per_s (based on selected currency on mouseWhel, using an array of currency values)
+    total_in_currency = (tx_total_value / 100000000) * price_array[currency_select]; // using chosen currency to display
+    currency_per_s = (total_in_currency / (millis() / 1000)).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    text(currency_per_s + " " + currency_array[currency_select] + "/s", width - 10, mempool.y - 10);
+
+    // kb/s
+    fill(21);
+    textSize(22);
+    textAlign(LEFT);
+    kb_per_s = (tx_total_size / 1000 / (millis() / 1000)).toFixed(2);
+    text(kb_per_s + " kb/s", 10, mempool.y - 10);
+
+
+    // Transactions
+    // Regulate the interval of adding balls if the number of waiting balls starts to back up
+    // if (balls_waiting.length <= 10) { interval_tx = 500; }
+    // if (balls_waiting.length > 20)  { interval_tx = 450; }
+    // if (balls_waiting.length > 30)  { interval_tx = 400; }
+    // if (balls_waiting.length > 40)  { interval_tx = 350; }
+    // if (balls_waiting.length > 50)  { interval_tx = 300; }
+    // if (balls_waiting.length > 60)  { interval_tx = 250; }
+    // if (balls_waiting.length > 70)  { interval_tx = 200; }
+    // if (balls_waiting.length > 80)  { interval_tx = 150; }
+    // if (balls_waiting.length > 90)  { interval_tx = 100; }
+    // if (balls_waiting.length > 100)  { interval_tx = 50; }
+    interval_tx = map(balls_waiting.length, 0, 100, 500, 50);
+
+    if (millis() > next_tx) { // millis() = time since program started
+        // Add a ball to live balls only if we have one
+        if (balls_waiting.length > 0) {
+            a = balls_waiting.shift(); // get the first one
+            balls.push(a); // add it to end of live balls
+
+            // tx/s
+            tx_count += 1;
+        }
+        // set the time the next ball can be added
+        next_tx += interval_tx;
+    }
+
+		// Transactions Show
+    if (balls.length > 0) { // Display and update live balls if there are any
+        // [x] Constantly draw .show each ball in array
+        for (i=0; i<balls.length; i++) {
+            balls[i].show();
+        }
+
+        // [x] Constantly .update each ball in array
+        for (i=0; i<balls.length; i++) {
+            balls[i].update(mempool); // Uses mempool so that they know when to bounce
+
+            // Try and change opacity of ball if it goes fullly past the mempool line (and a bit more)
+            if (balls[i].y - mempool.y > balls[i].d / 2) { // distance below mempool line > ball radius
+
+                // Only add balls to meter if they have not already passed the mempool line
+                if (balls[i].counted == false) {
+                  // Add ball to mempool count
+                  mempool.count += 1;
+                  mempool.size += balls[i].size;
+
+                  // Add it's value to the counter
+                  tx_total_value = tx_total_value + balls[i].value;
+
+                  // Add it's size to meter (for kb/s)
+                  tx_total_size = tx_total_size + balls[i].size;
+
+
+                  // Mark it as counted so it isn't constantly increasing counts
+                  balls[i].counted = true;
+                }
+
+            }
+
+            // [x] Remove ball from array if runs below bottom of window
+            if (balls[i].y > windowHeight + (balls[i].r * 2) + 200) {
+                // Remove ball
+                balls.splice(i, 1);
+            }
+
+        }
+    }
+
+    // Mempool
+    mempool.show();
+    mempool.update(); // update the top height of box based on number of txs in the mempool
+
+    if (togglemempool === true) { // Move mempool up on mousePressed
+      mempool.up();
+    }
+    if (togglemempool === false) { // Move mempool down on mousePressed
+      mempool.down();
+    }
+
+    // Blocks
+    // Regulator
     if (millis() > next_block) { // millis() = time since program started
         // Add a ball to live balls only if we have one
         if (blocks_waiting.length > 0) {
@@ -255,14 +254,12 @@ function draw() {
         next_block += interval_block;
     }
 
-    // Blocks
-    // Constantly .show each block in array
-    for (i=0; i<blocks.length; i++) {
+    // Show Blocks
+    for (i=0; i<blocks.length; i++) { // Constantly .show each block in array
         blocks[i].show();
     }
 
-    // Constantly .update each block in array
-    for (i=0; i<blocks.length; i++) {
+    for (i=0; i<blocks.length; i++) { // Constantly .update each block in array
       // stacking
       // if (i == 0) {
       //   blocks[i].update();
@@ -273,58 +270,13 @@ function draw() {
 
       // drop
       blocks[i].update();
+
       // [x] Remove ball from array if runs below bottom of window
       if (blocks[i].y > windowHeight+100) {
+          block_count += 1;
           blocks.splice(i, 1);
       }
 
-    }
-
-
-    // Regulate the interval of adding balls if the number of waiting balls starts to back up
-    if (balls_waiting.length <= 10) { interval_tx = 500; }
-    if (balls_waiting.length > 20)  { interval_tx = 450; }
-    if (balls_waiting.length > 30)  { interval_tx = 400; }
-    if (balls_waiting.length > 40)  { interval_tx = 350; }
-    if (balls_waiting.length > 50)  { interval_tx = 300; }
-    if (balls_waiting.length > 60)  { interval_tx = 250; }
-    if (balls_waiting.length > 70)  { interval_tx = 200; }
-    if (balls_waiting.length > 80)  { interval_tx = 150; }
-    if (balls_waiting.length > 90)  { interval_tx = 100; }
-    if (balls_waiting.length > 100)  { interval_tx = 50; }
-
-		// Transactions Regulator
-    if (millis() > next_tx) { // millis() = time since program started
-        // Add a ball to live balls only if we have one
-        if (balls_waiting.length > 0) {
-            a = balls_waiting.shift(); // get the first one
-            balls.push(a); // add it to end of live balls
-        }
-        // set the time the next ball can be added
-        next_tx += interval_tx;
-    }
-
-		// Transactions
-    if (balls.length > 0) { // Display and update live balls if there are any
-        // [x] Constantly draw .show each ball in array
-        for (i=0; i<balls.length; i++) {
-            balls[i].show();
-        }
-
-        // [x] Constantly .update each ball in array
-        for (i=0; i<balls.length; i++) {
-            balls[i].update();
-
-            // [x] Remove ball from array if runs below bottom of window
-            if (balls[i].y > windowHeight + (balls[i].d/2)) {
-                // Add it's value to the counter
-                total_value = total_value + balls[i].value;
-
-                // Remove ball
-                balls.splice(i, 1);
-            }
-
-        }
     }
 
 
@@ -333,24 +285,41 @@ function draw() {
     textSize(16);
     textAlign(CENTER);
 
-    text(balls_waiting.length, 48, 40);
-    text(balls.length, 48, 64);
-    text(interval_tx, 48, 88);
-    text(next_tx, 48, 112);
-    text(count, 48, 142);
+    //text(balls_waiting.length, 48, 40);
+    //text(balls.length, 48, 64);
+    //text(interval_tx, 48, 88);
+    //text(next_tx, 48, 112);
+    //text(tx_count, 48, 142);
 
-    text(blocks_waiting.length, 48, 180);
-    text(blocks.length, 48, 204);
-    text(interval_block, 48, 228);
-    text(next_block, 48, 252);
-
-    // btc/s
-    fill(37);
-    total_btc = total_value / 100000000;
-    btc_per_s = (total_btc / (millis() / 1000)).toFixed(2);
-    textSize(22);
-    text(btc_per_s + " btc/s", width/2, height-16);
+    //text(blocks_waiting.length, 48, 180);
+    //text(blocks.length, 48, 204);
+    //text(interval_block, 48, 228);
+    //text(next_block, 48, 252);
+    //text(deviceOrientation, 48, 252);
 
     // text(millis() + " ms", windowWidth-100, 40);   // p5js time since program started
     // text(frameCount + " frames", windowWidth-100, 80); // p5js frames since program started
+}
+
+// Toggle Mempool
+var togglemempool = false;
+
+function mousePressed() {
+    togglemempool = !togglemempool;
+    mempool.velocity = 4;
+}
+
+function mouseWheel(event) {
+  if (event.delta > 0) {
+    if (currency_select < currency_array.length -1) { // do not scroll beyond the length of the array
+      currency_select += 1; // select a different currency from the array
+      // currency_color = random(150, 255); // change color of currency
+    }
+  }
+  if (event.delta < 0) {
+    if (currency_select > 0) { // do not scroll beyond the first element in the array
+      currency_select -= 1; // select a different currency from the array
+      // currency_color = random(150, 255); // // change color of currency
+    }
+  }
 }

@@ -174,10 +174,11 @@ function decodeRawTransaction($data) {
     // return the PHP array
     // return $array;
     $rainarray['type'] = 'tx';
+    $rainarray['txid'] = $array['txid'];
     $rainarray['size'] = $array['size'];
     $rainarray['value'] = $totalvalue;
+    $rainarray['segwit'] = $array['segwit'];
     return $rainarray;
-
 
 } // end function
 
