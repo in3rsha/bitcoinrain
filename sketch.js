@@ -1,5 +1,5 @@
 // config
-var websocket_uri = "ws://85.119.83.25:8080"; // Connect to the websocket that proviedes a stream of tx, block, and mempool data
+var websocket_uri = "ws://bitcoinrain.io:8080"; // Connect to the websocket that proviedes a stream of tx, block, and mempool data
 
 // Meters
 var tx_total_value = 0;
