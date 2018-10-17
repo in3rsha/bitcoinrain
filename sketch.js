@@ -110,6 +110,7 @@ function setup() {
           price_array[4] = price.JPY; // ["GBP", price.GBP];
           price_array[5] = price.CNY; // ["GBP", price.GBP];
           price_array[6] = price.CHF; // ["GBP", price.GBP];
+          price_array[7] = price.AUD; // ["GBP", price.GBP];
 
           currency_array[0] = "BTC"; // ["BTC", 1];
           currency_array[1] = "USD"; // ["USD", price.USD];
@@ -118,6 +119,7 @@ function setup() {
           currency_array[4] = "JPY"; // ["GBP", price.GBP];
           currency_array[5] = "CNY"; // ["GBP", price.GBP];
           currency_array[6] = "CHF"; // ["GBP", price.GBP];
+          currency_array[7] = "AUD"; // ["GBP", price.GBP];
         }
     };
 
