@@ -172,13 +172,18 @@ function decodeRawTransaction($data) {
     $array['coinbase'] = $array['vin'][0]['txid'] == '0000000000000000000000000000000000000000000000000000000000000000' ? true : false;
 
     // return the PHP array
-    // return $array;
-    $rainarray['type'] = 'tx';
-    $rainarray['txid'] = $array['txid'];
-    $rainarray['size'] = $array['size'];
-    $rainarray['value'] = $totalvalue;
-    $rainarray['segwit'] = $array['segwit'];
-    return $rainarray;
+    //$rainarray['type'] = 'tx';
+    //$rainarray['txid'] = $array['txid'];
+    //$rainarray['size'] = $array['size'];
+    //$rainarray['value'] = $totalvalue;
+    //$rainarray['segwit'] = $array['segwit'];
+    //return $rainarray;
+
+    // Add the total value of the tx to the result
+    $array['value'] = $totalvalue;
+
+    // return the PHP array
+    return $array;
 
 } // end function
 

@@ -69,7 +69,7 @@ function setup() {
         		// [x] 3. Add transaction to waiting list
         		balls_waiting.push(ball);
 
-            //console.log(json);
+            console.log(json);
         	}
 
           // Add to meters while away (instead of adding after ball is dropped below window)
