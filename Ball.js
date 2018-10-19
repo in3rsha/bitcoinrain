@@ -7,9 +7,6 @@ function Ball(data) {
     // this.x = random(windowWidth);
     this.y = 0;
 
-    // counting
-    this.counted = false;
-
     // randomly set x position using the randomness of the txid
     txid_slice = data.txid.slice(-8); // get last 8 characters of txid
     txid_decimal = parseInt(txid_slice, 16); // convert hex to decimal
@@ -18,6 +15,9 @@ function Ball(data) {
     // diameter (map to size based on its value)
     //this.d = map(data.value, 0, 20000000000, 10, 160, true) // value - 200 btc max
     this.d = map(data.size, 190, 30000, 10, 160, true)        // size - 190 (1+1) to 30,000 bytes (214 inputs+outputs)
+
+    // counting
+    this.counted = false;
 
     // value
     this.value = data.value;
@@ -40,8 +40,8 @@ function Ball(data) {
     this.bounce_coefficient_mapped_variable = this.bounce_coefficient_mapped + randomGaussian(-0.00, 0.05); // a nice deviation from it's actual bounce
 
     this.elasticity = this.bounce_coefficient_mapped_variable; // [x] bounce height determined by size to value (big value, small size is bounciest)
-    this.bounce = 0; // bounce count
-    this.bounce_max = 1;
+    this.bounce = 0;     // bounce count
+    this.bounce_max = 1; // maximum number of bounces to do
 
     // color
     //this.r = random(255);
@@ -69,12 +69,10 @@ function Ball(data) {
     if (data.segwit !== false)  { this.color = color(200, 96, 198); }
 
     // Create a faded color in case it goes above the screen (for the placeholder)
-    //this.color.setAlpha = 10; // (255/100) * 10;
-    //this.faded = this.color; // copy color object
-    //this.faded.setAlpha = (255/100) * 25; // change opacity of color object
+    this.faded = color(red(this.color), green(this.color), blue(this.color), 64); // same color, just with alpha proprety (25%)
 
-    //console.log(alpha(this.color));
-    //console.log(alpha(this.faded));
+    // console.log(alpha(this.color));
+    // console.log(alpha(this.faded));
 
 
     // Blue
@@ -89,7 +87,6 @@ function Ball(data) {
     // if (value_mapped > 80)  { [this.r, this.g, this.b] = [200, 65, 162]; }
     // if (value_mapped > 90)  { [this.r, this.g, this.b] = [200, 53, 150]; }
     // if (value_mapped > 100) { [this.r, this.g, this.b] = [200, 41, 138]; } // 100+ btc
-
 
     // Rainbow
     //if (this.d > 0)   { [this.r, this.g, this.b] = [0, 124, 255]; }
@@ -199,7 +196,7 @@ function Ball(data) {
 
         // put marker if ball goes above top of screen (for funsies)
         if (this.y < 0) {
-          fill(this.color);
+          fill(this.faded); // same color, just with alpha to make it look faded out a bit
           ellipse(this.x, this.d/2, this.d, this.d);
 
           textAlign(CENTER);
