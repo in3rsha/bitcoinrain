@@ -27,6 +27,9 @@ function Ball(data) {
     this.size = data.size;
     this.size_kb = (this.size / 1000).toFixed(2);
 
+    // donation
+    this.donation = data.donation; // json message has a donation:true/false field
+
     // drop
     this.velocity = 0;
     this.gravity  = 0.25;
@@ -38,6 +41,7 @@ function Ball(data) {
 
     this.elasticity = this.bounce_coefficient_mapped_variable; // [x] bounce height determined by size to value (big value, small size is bounciest)
     this.bounce = 0; // bounce count
+    this.bounce_max = 1;
 
     // color
     //this.r = random(255);
@@ -48,21 +52,29 @@ function Ball(data) {
     value_mapped = map(this.value, 0, 10000000000, 0, 100); // 100 btc
 
     // Single Hue scale
-    if (value_mapped > 0)   { [this.r, this.g, this.b] = [0, 172, 202]; } // #00acca
-    if (value_mapped > 10)  { [this.r, this.g, this.b] = [0, 172, 202]; }
-    if (value_mapped > 20)  { [this.r, this.g, this.b] = [0, 153, 186]; } // #0099ba
-    if (value_mapped > 30)  { [this.r, this.g, this.b] = [0, 153, 186]; }
-    if (value_mapped > 40)  { [this.r, this.g, this.b] = [0, 153, 186]; }
-    if (value_mapped > 50)  { [this.r, this.g, this.b] = [0, 133, 168]; } // #0085a8
-    if (value_mapped > 60)  { [this.r, this.g, this.b] = [0, 133, 168]; }
-    if (value_mapped > 70)  { [this.r, this.g, this.b] = [0, 133, 168]; }
-    if (value_mapped > 80)  { [this.r, this.g, this.b] = [0, 114, 150]; } // #007296
-    if (value_mapped > 90)  { [this.r, this.g, this.b] = [0, 114, 150]; }
-    if (value_mapped > 100) { [this.r, this.g, this.b] = [0, 114, 150]; }
+    if (value_mapped > 0)   { this.color = color(0, 172, 202); } // #00acca
+    if (value_mapped > 10)  { this.color = color(0, 172, 202); }
+    if (value_mapped > 20)  { this.color = color(0, 153, 186); } // #0099ba
+    if (value_mapped > 30)  { this.color = color(0, 153, 186); }
+    if (value_mapped > 40)  { this.color = color(0, 153, 186); }
+    if (value_mapped > 50)  { this.color = color(0, 133, 168); } // #0085a8
+    if (value_mapped > 60)  { this.color = color(0, 133, 168); }
+    if (value_mapped > 70)  { this.color = color(0, 133, 168); }
+    if (value_mapped > 80)  { this.color = color(0, 114, 150); } // #007296
+    if (value_mapped > 90)  { this.color = color(0, 114, 150); }
+    if (value_mapped > 100) { this.color = color(0, 114, 150); }
                                                                           // #006083
 
     // Give Segwit transactions their own color
-    if (data.segwit !== false)  { [this.r, this.g, this.b] = [200, 96, 198]; }
+    if (data.segwit !== false)  { this.color = color(200, 96, 198); }
+
+    // Create a faded color in case it goes above the screen (for the placeholder)
+    //this.color.setAlpha = 10; // (255/100) * 10;
+    //this.faded = this.color; // copy color object
+    //this.faded.setAlpha = (255/100) * 25; // change opacity of color object
+
+    //console.log(alpha(this.color));
+    //console.log(alpha(this.faded));
 
 
     // Blue
@@ -96,12 +108,19 @@ function Ball(data) {
     // Bb = 255 236   0 #ffec00
     // C  =  40 255   0 #28ff00
 
+    // donations - 125T7hdVSaMXstpy4UWWm4RKTcTSfttYUb
+    if (this.donation) { // donation field is set by txdecoder.php
+      this.color = color(255, 215, 0); // golden ball!
+      // this.elasticity = 0.5            // super bouncy!
+      this.bounce_max = 20;            // bounces loads!
+      console.log("DONATION");
+    }
 
     // [ ] makes noise at a frequency based on color when hits bottom
     this.show = function() {
         // [x] color is based on value (using D-minor colours over ~2 octaves for set ranges of tx values)
         noStroke();
-        fill(this.r, this.g, this.b);
+        fill(this.color);
         ellipse(this.x, this.y, this.d, this.d);
 
         // Put value inside ball
@@ -122,6 +141,14 @@ function Ball(data) {
             text(this.size_kb + "kb", this.x, this.y+5)
         }
 
+        // Put donation message outside ball
+        if (data.donation == true) {
+            fill(255);
+            textSize(13);
+            textAlign(LEFT);
+            text("Thanks!", this.x + this.d + 2, this.y + 4);
+        }
+
         // text(data.size, this.x, this.y-60);
         // text(data.value, this.x, this.y-40);
         // text(this.bounce_co, this.x, this.y-40);
@@ -138,9 +165,17 @@ function Ball(data) {
 
         // [x] bounce
         if (this.y >= mempool.y - (this.d/2)) {
-            if (this.bounce < 1) { // number of bounces to do
+            if (this.bounce < this.bounce_max) { // number of bounces to do
                 this.y = mempool.y - (this.d/2);
-                this.velocity = - (this.velocity * this.elasticity);
+                this.velocity = - (this.velocity * this.elasticity); // reduce return velocity due to elasticity
+
+                // Don't let donation balls degrade to having no bounce
+                if (this.donation) {
+                  if (this.velocity > -6) { // -velocity means going up
+                    this.velocity = -6; // make sure velocity never goes below 8
+                  }
+                }
+
                 if (togglemempool == true) {
                   this.velocity -= mempool.velocity; // add velocity of mempool bar
                   // this.gravity *= 3; // increase speed of drop after it has been bounced up
@@ -153,7 +188,7 @@ function Ball(data) {
               this.below = this.y - mempool.y; // get the number of pixels the ball is below the mempool line
               // text(this.below.toFixed(1), this.x, this.y+15)
               // Try and fade out the ball
-              if (this.below > this.r) {
+              if (this.below > this.d) {
                 //noFill();
                 //stroke(5);
                 // lerpColor
@@ -164,7 +199,7 @@ function Ball(data) {
 
         // put marker if ball goes above top of screen (for funsies)
         if (this.y < 0) {
-          fill(this.r, this.g, this.b, (255/100) * 25 ); // change opacity to a percentage
+          fill(this.color);
           ellipse(this.x, this.d/2, this.d, this.d);
 
           textAlign(CENTER);
