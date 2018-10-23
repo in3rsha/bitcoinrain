@@ -1,7 +1,7 @@
 <?php
 require_once 'lib/tx.php';
 
-$donation_address = "125T7hdVSaMXstpy4UWWm4RKTcTSfttYUb"; // can set to something simple;
+$donation_address = "1RainRzqJtJxHTngafpCejDLfYq2y4KBc"; // can set to something simple;
 
 while (true) {
     // Create blank array for a type:tx json message

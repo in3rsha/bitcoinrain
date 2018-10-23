@@ -68,8 +68,17 @@ function Ball(data) {
     // Give Segwit transactions their own color
     if (data.segwit !== false)  { this.color = color(200, 96, 198); }
 
+    // donations - 125T7hdVSaMXstpy4UWWm4RKTcTSfttYUb
+    if (this.donation) { // donation field is set by txdecoder.php
+      this.color = color(255, 215, 0); // golden ball!
+      // this.elasticity = 0.5            // super bouncy!
+      this.bounce_max = 20;            // bounces loads!
+      console.log("DONATION");
+    }
+
     // Create a faded color in case it goes above the screen (for the placeholder)
-    this.faded = color(red(this.color), green(this.color), blue(this.color), 64); // same color, just with alpha proprety (25%)
+    // Manually
+    this.faded = color(red(this.color), green(this.color), blue(this.color), 64); // same, just with alpha property (25%)
 
     // console.log(alpha(this.color));
     // console.log(alpha(this.faded));
@@ -104,14 +113,6 @@ function Ball(data) {
     // A  = 255  99   0 #ff6300
     // Bb = 255 236   0 #ffec00
     // C  =  40 255   0 #28ff00
-
-    // donations - 125T7hdVSaMXstpy4UWWm4RKTcTSfttYUb
-    if (this.donation) { // donation field is set by txdecoder.php
-      this.color = color(255, 215, 0); // golden ball!
-      // this.elasticity = 0.5            // super bouncy!
-      this.bounce_max = 20;            // bounces loads!
-      console.log("DONATION");
-    }
 
     // [ ] makes noise at a frequency based on color when hits bottom
     this.show = function() {
@@ -197,7 +198,7 @@ function Ball(data) {
         // put marker if ball goes above top of screen (for funsies)
         if (this.y < 0) {
           fill(this.faded); // same color, just with alpha to make it look faded out a bit
-          ellipse(this.x, this.d/2, this.d, this.d);
+          ellipse(this.x, 0, this.d, this.d);
 
           textAlign(CENTER);
           // Store the world record bounce height!
@@ -205,14 +206,14 @@ function Ball(data) {
             bounce_record = -this.y;
             fill(255, 215, 0); // gold color if we're breaking the bounce record
             textSize(13);
-            text("New Record!", this.x, this.d + 36);
+            text("New Record!", this.x, this.d/2 + 36);
           } else {
             fill(0); // black otherwise
           }
 
           // Display the bounce height
           textSize(14);
-          text(-this.y.toFixed(0) + " px", this.x, this.d + 20); // -this.y because above sceen is a minus number, so make it positive
+          text(-this.y.toFixed(0) + " px", this.x, this.d/2 + 20); // -this.y because above sceen is a minus number, so make it positive
 
         }
 

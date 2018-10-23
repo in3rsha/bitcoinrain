@@ -4,7 +4,24 @@
     <title>Bitcoin Rain | Live Transaction Rate Visualisation</title>
 
     <style>
-      body {margin:0;}
+    @font-face {
+      font-family: 'whitrabt';
+      src: url('assets/whitrabt.ttf') format('truetype');
+    }
+
+      body {margin:0; font-family: Sans;}
+
+      #warning-message {display: none; margin:8px; font-size:36px;}
+      @media only screen and (orientation:portrait){
+          #sketch { display:none; }
+          #warning-message { display:block; }
+      }
+      @media only screen and (orientation:landscape){
+          #warning-message { display:none; }
+      }
+
+      div#donate {text-align:center; font-size:16px; font-family:'whitrabt', monospace; line-height:22px; width:400px; display:none;}
+      div#donate::selection {color: gold; background-color:#555;}
     </style>
 
     <script src="js/p5.min.js"></script>
@@ -17,19 +34,6 @@
     <script src="Block.js"></script>
     <script src="sketch.js"></script>
 
-    <style type="text/css">
-    body {font-family: Sans;}
-
-    #warning-message {display: none; margin:8px; font-size:36px;}
-    @media only screen and (orientation:portrait){
-        #sketch { display:none; }
-        #warning-message { display:block; }
-    }
-    @media only screen and (orientation:landscape){
-        #warning-message { display:none; }
-    }
-    </style>
-
   </head>
 
   <body>
@@ -38,5 +42,7 @@
     <div id="warning-message">
         This website works best in landscape mode. Rotate that slick device of yours and reload the page.
     </div>
+
+    <div id="donate">1RainRzqJtJxHTngafpCejDLfYq2y4KBc</div>
   </body>
 </html>

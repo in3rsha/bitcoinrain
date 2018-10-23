@@ -1,6 +1,9 @@
 // config
 var websocket_uri = "ws://bitcoinrain.io:8080"; // Connect to the websocket that proviedes a stream of tx, block, and mempool data
 
+// Style
+var bg = 55;
+
 // Meters
 var tx_total_value = 0;
 var tx_total_size = 0;
@@ -9,6 +12,17 @@ var block_count = 0;
 
 // Record!
 var bounce_record = 0;
+
+// Donation Box
+var donate; // donate box dom element handle
+var donate_show = false;
+var clicks = 0; // click counter
+var donate_threshold = 7; // number of clicks before donation box appears
+var donate_grey = 121; // starting color (grey) of font
+var donate_grey_reduce = 4; // how many degrees to fade grey out per click
+var donations_incoming = 0;
+var donate_x;
+var donate_y;
 
 // Regulation
 var balls_waiting = []; // this is global in scope (i.e. for the draw() loop)
@@ -54,6 +68,16 @@ function setup() {
     // Create Mempool area
     mempool = new Mempool();
 
+    // Donation Box
+    donate = select("#donate");
+    donate.style("width", "400px");
+    donate.style("font-family", myFont);
+    donate.style("color", "rgb("+donate_grey+", "+donate_grey+", "+donate_grey+")");
+    donate_x = windowWidth/2 - 200;
+    donate_y = windowHeight/2 - 100;
+    donate.position(donate_x, donate_y);
+    // donate.center();
+
     // Attach callback function to websocket event in the setup...
     var ws = new WebSocket(websocket_uri);
     ws.onmessage = function(s) { // s contains everything about the message
@@ -62,6 +86,11 @@ function setup() {
         json = JSON.parse(s.data);
 
 				if (json.type == 'tx') {
+          // Donation Incoming!
+          if (json.donation) {
+            donations_incoming++; // add to number of donations incoming
+          }
+
 					// Only add balls to array if the window is focused (prevent a torrent of backed up balls)
 					if (focused) {
         		// [x] Create a new transaction object (just a circle), pass it data
@@ -74,13 +103,21 @@ function setup() {
 
           // Add to meters while away (instead of adding after ball is dropped below window)
           if (!focused) {
-            tx_total_value += json.value;
-            tx_total_size += json.size;
-            mempool.count += 1; // mempool object count
-            mempool.size += json.size; // mempool object count
+            // Add ball to list to be dropped even if the window isn't focused
+            if (json.donation) {
+        		  ball = new Ball(json);
+        		  balls_waiting.push(ball);
+            }
+            // Otherwise, don't add ball to waiting list and just update meters instead
+            else {
+              tx_total_value += json.value;
+              tx_total_size += json.size;
+              mempool.count += 1; // mempool object count
+              mempool.size += json.size; // mempool object count
 
-            // tx/s
-          	tx_count += 1;
+              // tx/s
+          	  tx_count += 1;
+            }
           }
         }
 
@@ -130,7 +167,7 @@ function setup() {
 
 function draw() {
     // Redraw background constantly
-    background(55); // Single Color Hue website background = 46
+    background(bg); // Single Color Hue website background = 46
 
     // Logo
     noStroke();
@@ -188,6 +225,11 @@ function draw() {
             a = balls_waiting.shift(); // get the first one
             balls.push(a); // add it to end of live balls
 
+            // Remove donation incoming message if we have just made a donation ball go live
+            if (a.donation) {
+              donations_incoming--; // subtract from incoming donations count
+            }
+
             // tx/s
             tx_count += 1;
         }
@@ -206,7 +248,7 @@ function draw() {
         for (i=0; i<balls.length; i++) {
             balls[i].update(mempool); // Uses mempool so that they know when to bounce
 
-            // Try and change opacity of ball if it goes fullly past the mempool line (and a bit more)
+            // Do stuff if ball goes past the mempool line
             if (balls[i].y - mempool.y > balls[i].d / 2) { // distance below mempool line > ball radius
 
                 // Only add balls to meter if they have not already passed the mempool line
@@ -285,6 +327,22 @@ function draw() {
 
     }
 
+    // Donations Incoming
+    if (donations_incoming > 0) {
+      textAlign(CENTER);
+      textSize(16);
+      fill(255, 215, 0); // gold color
+      text("Donation Incoming!", windowWidth/2, 12);
+    }
+
+    if (donate_show) {
+      // Try Donating message
+      fill(donate_grey);
+      textSize(15);
+      textAlign(CENTER);
+      text("Try Donating!", windowWidth/2, donate_y + 40);
+    }
+
 
     // Info
     fill(200);
@@ -301,7 +359,9 @@ function draw() {
     //text(blocks.length, 48, 204);
     //text(interval_block, 48, 228);
     //text(next_block, 48, 252);
+
     //text(deviceOrientation, 48, 252);
+    //text(clicks, 48, 252);
 
     // text(millis() + " ms", windowWidth-100, 40);   // p5js time since program started
     // text(frameCount + " frames", windowWidth-100, 80); // p5js frames since program started
@@ -313,6 +373,29 @@ var togglemempool = false;
 function touchStarted() { // touch for mobiles (will use mousePressed instead if this is not defined)
     togglemempool = !togglemempool;
     mempool.velocity = 4;
+
+    // Increment Click Counter (do stuff after number of clicks)
+    clicks++;
+
+    // Display Donation Box after a number of clicks
+    if (clicks >= donate_threshold) {
+
+      //donate.style("display", "block");
+      donate.show(); // use p5js show() instead of donate.style("display", "block");
+      // Reduce lightness of font color so it fades out
+      donate_grey = donate_grey - donate_grey_reduce; // reduce lightness
+      donate_grey = Math.max(donate_grey, bg); // don't fade darker than the background color
+      donate.style("color", "rgb("+donate_grey+", "+donate_grey+", "+donate_grey+")"); // update font color
+
+      donate_show = true;
+
+      // Hide donation box once it has fully faded out
+      if (donate_grey == bg) {
+        donate_show = false;
+        donate.hide();
+      }
+
+    }
 }
 
 // function mousePressed() {
