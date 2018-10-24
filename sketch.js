@@ -1,6 +1,10 @@
 // config
 var websocket_uri = "ws://bitcoinrain.io:8080"; // Connect to the websocket that proviedes a stream of tx, block, and mempool data
 
+// Connection
+var problem = false;
+var problem_message;
+
 // Style
 var bg = 55;
 
@@ -82,6 +86,17 @@ function setup() {
 
         // [x] parse json data
         json = JSON.parse(s.data);
+
+        if (json.type == 'status') {
+          if (json.message == 'fail') { // e.g. server.rb not running
+          	problem = true;
+            problem_message = "Couldn't connect to live transaction stream.";
+          }
+          if (json.message == 'closed') { // e.g. server.rb stops running
+          	problem = true;
+            problem_message = "Connection to live transaction stream has closed. Try refreshing browser in a sec.";
+          }
+        }
 
 				if (json.type == 'tx') {
           // Donation Incoming!
@@ -166,6 +181,14 @@ function setup() {
 function draw() {
     // Redraw background constantly
     background(bg); // Single Color Hue website background = 46
+
+    // Problem?
+    if (problem) {
+      fill(255, 0, 50);
+      textSize(28);
+      textAlign(CENTER);
+      text(problem_message, windowWidth/2, 56);
+    }
 
     // Logo
     noStroke();

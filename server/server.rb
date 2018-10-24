@@ -94,7 +94,7 @@ loop do
     blockdecoder.puts message.payload # write block data to decoder
     json = blockdecoder.gets          # read decoded json from it
     puts json
-    puts "FUCKING BLOCK YEAH"
+    # puts "FUCKING BLOCK YEAH"
 
     # Get an up to date mempool count, because a new block reduces the size of the mempool
     mempoolinfo = getmempoolinfo() # returns json (using function from getmempoolcount.rb)
