@@ -399,8 +399,8 @@ function touchStarted() { // touch for mobiles (will use mousePressed instead if
     // Increment Click Counter (do stuff after number of clicks)
     clicks++;
 
-    // Display Donation Box after a number of clicks
-    if (clicks >= donate_threshold) {
+    // Display Donation Box after a number of clicks (and there is no problem with the connection)
+    if (clicks >= donate_threshold && !problem) {
 
       //donate.style("display", "block");
       donate.show(); // use p5js show() instead of donate.style("display", "block");
