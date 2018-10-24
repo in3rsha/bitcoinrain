@@ -184,7 +184,7 @@ function Ball(data) {
                   }
                 }
 
-                if (togglemempool == true) {
+                if (mempool.active == true) {
                   this.velocity -= mempool.velocity; // add velocity of mempool bar
                   // this.gravity *= 3; // increase speed of drop after it has been bounced up
                 }

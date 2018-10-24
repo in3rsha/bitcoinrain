@@ -55,11 +55,9 @@ function preload() { // preload stuff (before setup() and all other p5 stuff)
 }
 
 function setup() {
-    var width = windowWidth;
-    var height = windowHeight;
 
     // Canvas
-    var myCanvas = createCanvas(width, height);
+    var myCanvas = createCanvas(windowWidth, windowHeight);
     myCanvas.parent('sketch'); // show the sketch in a specific div
 
     // Font
@@ -174,12 +172,12 @@ function draw() {
     fill(21);
     textSize(56);
     textAlign(CENTER);
-    text("bitcoinrain", width/2, height/2);
+    text("bitcoinrain", windowWidth/2, windowHeight/2);
 
     // tx/s
     tps = (tx_count / (millis() / 1000)).toFixed(1);
     textSize(26);
-    text(tps + " tx/s", width/2, (height/2)+36);   // p5js time since program started
+    text(tps + " tx/s", windowWidth/2, (windowHeight/2)+36);   // p5js time since program started
 
     // btc/s
     fill(currency_color);
@@ -283,10 +281,10 @@ function draw() {
     mempool.show();
     mempool.update(); // update the top height of box based on number of txs in the mempool
 
-    if (togglemempool === true) { // Move mempool up on mousePressed
+    if (mempool.active === true) { // Move mempool up on mousePressed
       mempool.up();
     }
-    if (togglemempool === false) { // Move mempool down on mousePressed
+    if (mempool.active === false) { // Move mempool down on mousePressed
       mempool.down();
     }
 
@@ -335,6 +333,10 @@ function draw() {
       text("Donation Incoming!", windowWidth/2, 12);
     }
 
+    donate_x = windowWidth/2 - 200;
+    donate_y = windowHeight/2 - 100;
+    donate.position(donate_x, donate_y);
+
     if (donate_show) {
       // Try Donating message
       fill(donate_grey);
@@ -367,11 +369,8 @@ function draw() {
     // text(frameCount + " frames", windowWidth-100, 80); // p5js frames since program started
 }
 
-// Toggle Mempool
-var togglemempool = false;
-
 function touchStarted() { // touch for mobiles (will use mousePressed instead if this is not defined)
-    togglemempool = !togglemempool;
+    mempool.active = !mempool.active; // toggle true/false
     mempool.velocity = 4;
 
     // Increment Click Counter (do stuff after number of clicks)
@@ -398,11 +397,6 @@ function touchStarted() { // touch for mobiles (will use mousePressed instead if
     }
 }
 
-// function mousePressed() {
-//     togglemempool = !togglemempool;
-//     mempool.velocity = 4;
-// }
-
 function mouseWheel(event) {
   if (event.delta > 0) {
     if (currency_select < currency_array.length -1) { // do not scroll beyond the length of the array
@@ -417,3 +411,19 @@ function mouseWheel(event) {
     }
   }
 }
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+
+  if (mempool.active == false) {
+    mempool.y = mempool.closed; // Down not show the mempool at any time if it is not active
+  }
+
+  if (mempool.active == true) {
+    mempool.y = mempool.height; // Keep the mempool at its maximum position
+  }
+}
+
+// function mousePressed() {
+//    ...
+// }
