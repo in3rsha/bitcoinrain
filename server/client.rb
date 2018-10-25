@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require 'socket'
-require_relative '../rpc/getmempoolinfo.rb' # learnmeabitcoin.com API
-require_relative '../rpc/getprices.rb'      # learnmeabitcoin.com API
+require_relative 'requests/getmempoolinfo.rb' # learnmeabitcoin.com API
+require_relative 'requests/getprices.rb'      # learnmeabitcoin.com API
 
 # Autoflush output (always gotta flush to STDOUT)
 STDOUT.sync = true

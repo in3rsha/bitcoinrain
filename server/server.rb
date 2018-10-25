@@ -1,6 +1,6 @@
 require 'socket'
 require_relative '../lib/bitcoin.rb'
-require_relative '../rpc/getmempoolinfo.rb' # Get an up to date mempool count after new block arrives
+require_relative 'requests/getmempoolinfo.rb' # Get an up to date mempool count after new block arrives
 
 # A. Create socket for clients to read from
 File.unlink('stream.sock') # delete socket file if it already exists (otherwise error)
