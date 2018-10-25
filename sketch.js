@@ -1,5 +1,6 @@
 // config
 var websocket_uri = "ws://bitcoinrain.io:8080"; // Connect to the websocket that proviedes a stream of tx, block, and mempool data
+var debug = true; // set this to true to show debug stats on the screen
 
 // Connection
 var problem = false;
@@ -369,27 +370,35 @@ function draw() {
     }
 
 
-    // Info
-    fill(200);
-    textSize(16);
-    textAlign(CENTER);
+    // Debugging Info
+    if (debug) {
+      fill(200);
+      textSize(16);
+      textAlign(LEFT);
 
-    //text(balls_waiting.length, 48, 40);
-    //text(balls.length, 48, 64);
-    //text(interval_tx, 48, 88);
-    //text(next_tx, 48, 112);
-    //text(tx_count, 48, 142);
+      text("Balls Waiting:  " + balls_waiting.length, 24, 40);
+      text("Balls Active:   " + balls.length, 24, 64);
+      text("Interval:       " + interval_tx, 24, 88);
+      text("Next Tx:        " + next_tx, 24, 112);
+      text("Total Txs:      " + tx_count, 24, 136);
 
-    //text(blocks_waiting.length, 48, 180);
-    //text(blocks.length, 48, 204);
-    //text(interval_block, 48, 228);
-    //text(next_block, 48, 252);
+      text("Blocks Waiting: " + blocks_waiting.length, 24, 180);
+      text("Blocks Active:  " + blocks.length, 24, 204);
+      text("Interval:       " + interval_block, 24, 228);
+      text("Next Block:     " + next_block, 24, 252);
 
-    //text(deviceOrientation, 48, 252);
-    //text(clicks, 48, 252);
+      text("Orientation:    " + deviceOrientation, 24, 300);
+      text("Clicks:         " + clicks, 24, 324);
 
-    // text(millis() + " ms", windowWidth-100, 40);   // p5js time since program started
-    // text(frameCount + " frames", windowWidth-100, 80); // p5js frames since program started
+      if (frameRate() < 50) {
+        fill(255, 0, 0);
+      }
+      text("Frame Rate:     " + frameRate().toFixed(0), 24, 372);
+
+      fill(200);
+      text(millis() + " ms", windowWidth-100, 40);   // p5js time since program started
+      text(frameCount + " frames", windowWidth-100, 80); // p5js frames since program started
+    }
 }
 
 function touchStarted() { // touch for mobiles (will use mousePressed instead if this is not defined)
