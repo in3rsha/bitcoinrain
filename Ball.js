@@ -17,6 +17,8 @@ function Ball(data) {
 
     // counting
     this.counted = false; // do not add me to any counters if I have already been counted
+    this.gone_above = false; // keep track of if I have gone above the top of the screen or not
+    this.record_set = false; // keep track of if I have set a new record or not
 
     // value
     this.value = data.value;
@@ -207,6 +209,12 @@ function Ball(data) {
 
         // Placeholder if ball goes above top of screen (for funsies)
         if (this.y < 0) {
+          if (this.gone_above == false) {
+            bounces_above++; // increment the global counter for balls that have gone above the top of the screen
+            this.gone_above = true; // only add to counter once
+          }
+
+
           // Change alpha transparency the higher it goes
           this.fade = map(-this.y, 0, 600, 200, 25); // 200 = 80% start, 12 = 5% min
           this.fade = Math.max(this.fade, 25); // don't let it completely fade out if it goes mega hight
@@ -217,8 +225,16 @@ function Ball(data) {
           ellipse(this.x, 0, this.d, this.d);
 
           textAlign(CENTER);
+
           // Store the world record bounce height!
           if (-this.y > bounce_record) {
+
+            // Keep track of number of new records set
+            if (this.record_set == false) {
+              records_set++; // increment global counter for the number of new records we have set
+              this.record_set = true; // only count once
+            }
+
             bounce_record = -this.y;
             fill(255, 215, 0); // gold color if we're breaking the bounce record
             textSize(13);

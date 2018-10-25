@@ -17,12 +17,14 @@ var block_count = 0;
 
 // Record!
 var bounce_record = 0;
+var records_set = 0; // keep track of how many times a new record has been set
+var bounces_above = 0; // keep track of how many balls make it above the top of the screen
 
 // Donation Box
 var donate; // donate box dom element handle
 var donate_show = false;
+var donations_threshold = Math.floor(Math.random() * (10 - 5)) + 5; // random number between 5 and 10?
 var clicks = 0; // click counter
-var donate_threshold = 7; // number of clicks before donation box appears
 var donate_grey = 121; // starting color (grey) of font
 var donate_grey_reduce = 4; // how many degrees to fade grey out per click
 var donations_incoming = 0;
@@ -361,6 +363,22 @@ function draw() {
     donate_y = windowHeight/2 - 100;
     donate.position(donate_x, donate_y);
 
+    // Display Donation Box after a number of balls above screen (and there is no problem with the connection)
+
+    if (bounces_above >= donations_threshold && !problem) {
+
+      //donate.style("display", "block");
+      donate.show(); // use p5js show() instead of donate.style("display", "block");
+      donate_show = true;
+
+      // Hide donation box once it has fully faded out
+      if (donate_grey == bg) {
+        donate_show = false;
+        donate.hide();
+      }
+
+    }
+
     if (donate_show) {
       // Try Donating message
       fill(donate_grey);
@@ -382,22 +400,24 @@ function draw() {
       text("Next Tx:        " + next_tx, 24, 112);
       text("Total Txs:      " + tx_count, 24, 136);
 
-      text("Blocks Waiting: " + blocks_waiting.length, 24, 180);
-      text("Blocks Active:  " + blocks.length, 24, 204);
-      text("Interval:       " + interval_block, 24, 228);
-      text("Next Block:     " + next_block, 24, 252);
+      // text("Blocks Waiting: " + blocks_waiting.length, 24, 180);
+      // text("Blocks Active:  " + blocks.length, 24, 204);
+      // text("Interval:       " + interval_block, 24, 228);
+      // text("Next Block:     " + next_block, 24, 252);
+      //
+      // text("Orientation:    " + deviceOrientation, 24, 300);
+      // text("Clicks:         " + clicks, 24, 324);
 
-      text("Orientation:    " + deviceOrientation, 24, 300);
-      text("Clicks:         " + clicks, 24, 324);
+      text("Bounces Above:  " + bounces_above, 24, 396);
+      text("Records Set:    " + records_set, 24, 420);
+      text("Donate Bounces: " + donations_threshold, 24, 444);
 
-      if (frameRate() < 50) {
-        fill(255, 0, 0);
-      }
-      text("Frame Rate:     " + frameRate().toFixed(0), 24, 372);
-
+      textAlign(RIGHT);
+      text("Millisconds:    " + millis(), windowWidth-24, 40);   // p5js time since program started
+      text("Frame Count:    " + frameCount, windowWidth-24, 80); // p5js frames since program started
+      if (frameRate() < 50) { fill(255, 0, 0); } // show frame count in red if it drops a lot
+      text("Frame Rate:     " + frameRate().toFixed(0), windowWidth-24, 104);
       fill(200);
-      text(millis() + " ms", windowWidth-100, 40);   // p5js time since program started
-      text(frameCount + " frames", windowWidth-100, 80); // p5js frames since program started
     }
 }
 
@@ -408,24 +428,11 @@ function touchStarted() { // touch for mobiles (will use mousePressed instead if
     // Increment Click Counter (do stuff after number of clicks)
     clicks++;
 
-    // Display Donation Box after a number of clicks (and there is no problem with the connection)
-    if (clicks >= donate_threshold && !problem) {
-
-      //donate.style("display", "block");
-      donate.show(); // use p5js show() instead of donate.style("display", "block");
-      // Reduce lightness of font color so it fades out
+    // Donations Box - Reduce lightness so it fades out on each click
+    if (donate_show) {
       donate_grey = donate_grey - donate_grey_reduce; // reduce lightness
       donate_grey = Math.max(donate_grey, bg); // don't fade darker than the background color
       donate.style("color", "rgb("+donate_grey+", "+donate_grey+", "+donate_grey+")"); // update font color
-
-      donate_show = true;
-
-      // Hide donation box once it has fully faded out
-      if (donate_grey == bg) {
-        donate_show = false;
-        donate.hide();
-      }
-
     }
 }
 
