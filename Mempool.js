@@ -12,6 +12,7 @@ function Mempool() {
 
   // State
   this.expanded = false;
+  this.raised = false;
 
   // Box
   this.x = 0;

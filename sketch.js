@@ -73,6 +73,9 @@ function setup() {
     // Create Mempool area
     mempool = new Mempool();
 
+    // Create Blockchain area
+    blockchain = new Blockchain();
+
     // Donation Box
     donate = select("#donate");
     donate.style("width", "400px");
@@ -422,22 +425,72 @@ function draw() {
 }
 
 function touchStarted() { // touch for mobiles (will use mousePressed instead if this is not defined)
-    mempool.expanded = !mempool.expanded; // toggle true/false
-    mempool.velocity = 4;
+    // mempool.expanded = !mempool.expanded; // toggle true/false
+    // mempool.velocity = 4;
 
     // State
-    // if (mempool.expanded == false) {
-    //   mempool.expanded = true;
-    // }
-    // else {
-    //   mempool.expanded = false;
-    // }
+
+    if (mempool.expanded == false) {
+      //  _______
+      // |       |
+      // |       |
+      // |       |
+      // |_______|
+
+      mempool.expanded = true;
+      console.log("mempool expanded");
+    }
+
+    else {
+      if (blockchain.raised) {
+        //  _______
+        // |       |
+        // |_______|
+        // |__mem__|
+        // |__blk__|
+
+        mempool.raised = false;     // lower it
+        blockchain.raised = false;  // lower it
+        console.log("mempool lowered");
+        console.log("blockchain lowered");
+      }
+      else {
+        //  _______
+        // |       |
+        // |       |
+        // |_______|
+        // |__mem__|
+        
+        if (mempool.clicked()) {
+          //  _______
+          // |       |
+          // |       |
+          // |_______|
+          // |__mem__| <- click here
+
+          mempool.raised = true;
+          blockchain.raised = true;
+          console.log("mempool raised");
+          console.log("blockchain raised");
+        }
+        else {
+          //  _______
+          // |       |
+          // |       | <- click here
+          // |_______|
+          // |__mem__|
+
+          mempool.expanded = false;
+          console.log("mempool unexpanded");
+        }
+      }
+    }
 
     // Increment Click Counter (do stuff after number of clicks)
     clicks++;
 
     // Mempool clicked?
-    console.log(mempool.clicked());
+    // console.log(mempool.clicked());
 
     // Donations Box - Reduce lightness so it fades out on each click
     if (donate_show) {
