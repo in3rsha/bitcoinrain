@@ -14,6 +14,9 @@ function Mempool() {
   this.active = false;
 
   // Box
+  this.x = 0;
+  this.width = windowWidth;
+
   this.max = windowHeight / 10;  // percentage of the screen when mempool is "full"
   this.min = windowHeight / 1.15; // percentage of the screen when mempool is empty
   this.height = map(this.size, 0, this.size_max, this.min, this.max); // map mempool size to between the min and max values
@@ -42,11 +45,11 @@ function Mempool() {
     // fill(0, 76, 109);
     // fill(0, 109, 144);
     this.mempoolfill = fill(0, 96, 131); // #006083
-    this.mempoolbox = rect(0, this.y, windowWidth, this.y + this.length);
+    this.mempoolbox = rect(this.x, this.y, this.width, this.y + this.length);
     // box.mousePressed(changeGrey);
     stroke(0);
     strokeWeight(1);
-    line(0, this.y, windowWidth, this.y)
+    line(this.x, this.y, this.width, this.y)
 
     // Title
     noStroke();
@@ -113,6 +116,14 @@ function Mempool() {
     this.height = Math.max(this.height, this.max); // prevent the height from exceeding the maximum height due to exceeding the mapping
     this.length = windowHeight - this.height; // the total length of the mempool box (for use when positioning text in the center of it)
     this.closed = windowHeight; // the y position of the top of the mempool when it is closed (not toggled)
+  }
+
+  this.clicked = function() {
+    if (mouseX > this.x && mouseX < (this.x + this.width) && mouseY > this.y && mouseY < (this.y + this.length)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
 }
