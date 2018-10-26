@@ -10,8 +10,8 @@ function Mempool() {
   this.size = 0; // bytes
   this.size_max = 40 * 1000 * 1000; // 40MB
 
-  // Active (toggle)
-  this.active = false;
+  // State
+  this.expanded = false;
 
   // Box
   this.x = 0;
@@ -84,7 +84,7 @@ function Mempool() {
     text(block_count + " Blocks Mined", windowWidth/2, this.y + this.length - 6);
   }
 
-  this.up = function() {
+  this.expand = function() {
     if (this.y > this.height) { // if bar is below the top point
       this.velocity += this.gravity;
       this.y -= this.velocity;
@@ -96,7 +96,7 @@ function Mempool() {
     //this.height = windowHeight - this.y;
   }
 
-  this.down = function() {
+  this.contract = function() {
     if (this.y < this.closed) { // if bar is below the top point
       this.velocity += this.gravity;
       this.y += this.velocity;

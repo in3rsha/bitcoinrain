@@ -307,11 +307,11 @@ function draw() {
     mempool.show();
     mempool.update(); // update the top height of box based on number of txs in the mempool
 
-    if (mempool.active === true) { // Move mempool up on mousePressed
-      mempool.up();
+    if (mempool.expanded === true) { // Move mempool up on mousePressed
+      mempool.expand();
     }
-    if (mempool.active === false) { // Move mempool down on mousePressed
-      mempool.down();
+    if (mempool.expanded === false) { // Move mempool down on mousePressed
+      mempool.contract();
     }
 
     // Blocks
@@ -422,11 +422,22 @@ function draw() {
 }
 
 function touchStarted() { // touch for mobiles (will use mousePressed instead if this is not defined)
-    mempool.active = !mempool.active; // toggle true/false
+    mempool.expanded = !mempool.expanded; // toggle true/false
     mempool.velocity = 4;
+
+    // State
+    // if (mempool.expanded == false) {
+    //   mempool.expanded = true;
+    // }
+    // else {
+    //   mempool.expanded = false;
+    // }
 
     // Increment Click Counter (do stuff after number of clicks)
     clicks++;
+
+    // Mempool clicked?
+    console.log(mempool.clicked());
 
     // Donations Box - Reduce lightness so it fades out on each click
     if (donate_show) {
@@ -454,11 +465,11 @@ function mouseWheel(event) {
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 
-  if (mempool.active == false) {
+  if (mempool.expanded == false) {
     mempool.y = mempool.closed; // Down not show the mempool at any time if it is not active
   }
 
-  if (mempool.active == true) {
+  if (mempool.expanded == true) {
     mempool.y = mempool.height; // Keep the mempool at its maximum position
   }
 }
