@@ -1,6 +1,6 @@
 // config
 var websocket_uri = "ws://bitcoinrain.io:8080"; // Connect to the websocket that proviedes a stream of tx, block, and mempool data
-var debug = true; // set this to true to show debug stats on the screen
+var debug = false; // set this to true to show debug stats on the screen
 
 // Connection
 var problem = false;
@@ -233,17 +233,8 @@ function draw() {
 
 
     // Transactions
+
     // Regulate the interval of adding balls if the number of waiting balls starts to back up
-    // if (balls_waiting.length <= 10) { interval_tx = 500; }
-    // if (balls_waiting.length > 20)  { interval_tx = 450; }
-    // if (balls_waiting.length > 30)  { interval_tx = 400; }
-    // if (balls_waiting.length > 40)  { interval_tx = 350; }
-    // if (balls_waiting.length > 50)  { interval_tx = 300; }
-    // if (balls_waiting.length > 60)  { interval_tx = 250; }
-    // if (balls_waiting.length > 70)  { interval_tx = 200; }
-    // if (balls_waiting.length > 80)  { interval_tx = 150; }
-    // if (balls_waiting.length > 90)  { interval_tx = 100; }
-    // if (balls_waiting.length > 100)  { interval_tx = 50; }
     interval_tx = map(balls_waiting.length, 0, 100, 500, 50);
 
     if (millis() > next_tx) { // millis() = time since program started
@@ -306,17 +297,6 @@ function draw() {
         }
     }
 
-    // Mempool
-    mempool.show();
-    mempool.update(); // update the top height of box based on number of txs in the mempool
-
-    if (mempool.expanded === true) { // Move mempool up on mousePressed
-      mempool.expand();
-    }
-    if (mempool.expanded === false) { // Move mempool down on mousePressed
-      mempool.contract();
-    }
-
     // Blocks
     // Regulator
     if (millis() > next_block) { // millis() = time since program started
@@ -362,12 +342,12 @@ function draw() {
       text("Donation Incoming!", windowWidth/2, 12);
     }
 
+    // Donation Box
     donate_x = windowWidth/2 - 200;
     donate_y = windowHeight/2 - 100;
     donate.position(donate_x, donate_y);
 
     // Display Donation Box after a number of balls above screen (and there is no problem with the connection)
-
     if (bounces_above >= donations_threshold && !problem) {
 
       //donate.style("display", "block");
@@ -388,6 +368,18 @@ function draw() {
       textSize(15);
       textAlign(CENTER);
       text("Try Donating!", windowWidth/2, donate_y + 40);
+    }
+
+
+    // Mempool
+    mempool.show();
+    mempool.update(); // update the top height of box based on number of txs in the mempool
+
+    if (mempool.expanded === true) { // Move mempool up on mousePressed
+      mempool.expand();
+    }
+    if (mempool.expanded === false) { // Move mempool down on mousePressed
+      mempool.contract();
     }
 
 
@@ -460,7 +452,7 @@ function touchStarted() { // touch for mobiles (will use mousePressed instead if
         // |       |
         // |_______|
         // |__mem__|
-        
+
         if (mempool.clicked()) {
           //  _______
           // |       |
@@ -486,11 +478,11 @@ function touchStarted() { // touch for mobiles (will use mousePressed instead if
       }
     }
 
-    // Increment Click Counter (do stuff after number of clicks)
-    clicks++;
-
     // Mempool clicked?
     // console.log(mempool.clicked());
+
+    // Increment Click Counter (do stuff after number of clicks)
+    clicks++;
 
     // Donations Box - Reduce lightness so it fades out on each click
     if (donate_show) {
