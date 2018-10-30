@@ -16,28 +16,21 @@ function Blockchain(data) {
   }
 
   this.raise = function() {
-    if (this.y > windowHeight - this.height) { // if bar is below the top point
+    if (this.y > windowHeight - this.height) {
       this.y -= this.velocity;
-    } else {
+    }
+    else {
       this.y = windowHeight - this.height;
     }
   }
 
   this.lower = function() {
-    //this.c = random(250);
     if (this.y < windowHeight) {
       this.y += this.velocity;
     }
     else {
       this.y = windowHeight;
     }
-    // if (this.y < windowHeight) {
-    //   this.y -= 1;
-    //   // this.y += this.velocity;
-    // } else {
-    //   this.y = windowHeight;
-    //   this.velocity = 0;
-    // }
   }
 
   this.update = function() {

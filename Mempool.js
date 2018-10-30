@@ -20,6 +20,13 @@ function Mempool() {
   // Transition
   this.expanded_complete = false;
 
+  // Expanding Physics
+  this.velocity = 0;
+  this.gravity  = 1;
+
+  // Raising Physics
+  this.raise_velocity = 8;
+
   // Box
   this.x = 0;
   this.width = windowWidth;
@@ -40,9 +47,6 @@ function Mempool() {
   //this.y = this.min;              // starting position
   //this.length = windowHeight - (windowHeight / this.ratio); // the length of the box
   //this.height = windowHeight - this.y; // the height of the box from the bottom
-
-  this.velocity = 0;
-  this.gravity  = 1;
 
   this.show = function() {
     // Mempool Box
@@ -98,9 +102,8 @@ function Mempool() {
       this.expanded_complete = true;
     }
 
-    this.textsize = map(windowHeight - this.y, 0, windowHeight - this.height, 16, 42); // scale size of text based on size of mempool box
-    // Update the height of the mempool box
-    //this.height = windowHeight - this.y;
+    // scale size of text based on size of mempool box
+    this.textsize = map(windowHeight - this.y, 0, windowHeight - this.height, 16, 42);
   }
 
   this.contract = function() {
@@ -121,12 +124,10 @@ function Mempool() {
 
   this.raise = function() {
     this.y = blockchain.y - this.length;
-    // this.base = blockchain.y;
   }
 
   this.lower = function() {
-      this.y = blockchain.y - this.length;
-    // this.base = windowHeight;
+    this.y = blockchain.y - this.length;
   }
 
   this.update = function() {
