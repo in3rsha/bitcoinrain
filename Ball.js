@@ -92,37 +92,59 @@ function Ball(data) {
 
 
     // Value Range (use this for more easily mapping colors later...)
-    var value_mapped = map(this.value, 0, 10000000000, 0, 100); // 100 btc
-    value_mapped = Math.min(value_mapped, 100); // don't let it go above 100
+    // var value_mapped = map(this.value, 0, 10000000000, 0, 100); // 100 btc
+    // value_mapped = Math.min(value_mapped, 100); // don't let it go above 100
+    //
+    // // Map Brightness based on Value
+    // this.r = 0;
+    // this.g = map(value_mapped, 0, 100, 150, 255); // 114->172
+    // this.b = map(value_mapped, 0, 100, 150, 255); // 150->202
+    //
+    // // Give Segwit transactions their own color
+    // if (data.segwit !== false)  {
+    //   this.r = map(value_mapped, 0, 100, 153, 255);
+    //   this.g = map(value_mapped, 0, 100, 96, 172);
+    //   this.b = 255; // this.color = color(200, 96, 198); // original purple
+    // }
+    //
+    // // donations - 125T7hdVSaMXstpy4UWWm4RKTcTSfttYUb
+    // if (this.donation) { // donation field is set by txdecoder.php
+    //   this.r = 255; //this.color = color(255, 215, 0); // golden ball!
+    //   this.g = 215;
+    //   this.b = 0;
+    //   // this.elasticity = 0.5         // super bouncy!
+    //   this.bounce_max = 20;            // bounces loads!
+    //   // console.log("DONATION");
+    // }
+    //
+    // // Set the color based on the individual rgb colors we have set
+    // this.color = color(this.r, this.g, this.b);
 
-    // Map Brightness based on Value
-    this.r = 0;
-    this.g = map(value_mapped, 0, 100, 150, 255); // 114->172
-    this.b = map(value_mapped, 0, 100, 150, 255); // 150->202
 
-    // Give Segwit transactions their own color
+    // HSB colors
+
+    // Blue (Normal)
+    this.h = 195;
+    this.s = 100;
+    this.b = 100;
+
+    // Purple (Segwit)
     if (data.segwit !== false)  {
-      this.r = map(value_mapped, 0, 100, 153, 255);
-      this.g = map(value_mapped, 0, 100, 96, 172);
-      this.b = 255; // this.color = color(200, 96, 198); // original purple
+      this.h = 288;
     }
 
-    // donations - 125T7hdVSaMXstpy4UWWm4RKTcTSfttYUb
+    // Gold (Donation)
     if (this.donation) { // donation field is set by txdecoder.php
-      this.r = 255; //this.color = color(255, 215, 0); // golden ball!
-      this.g = 215;
-      this.b = 0;
-      // this.elasticity = 0.5         // super bouncy!
+      this.h = 51;
       this.bounce_max = 20;            // bounces loads!
-      // console.log("DONATION");
     }
 
-    // Set the color based on the individual rgb colors we have set
-    this.color = color(this.r, this.g, this.b);
+    this.color = color(this.h, this.s, this.b);
+
 
     // Create a faded color in case it goes above the screen (for the placeholder)
-    this.fade = 200;
-    this.faded = color(this.r, this.g, this.b, this.fade); // add alpha value
+    this.fade = 0.8;
+    this.faded = color(this.h, this.s, this.b, this.fade); // add alpha value
     // this.faded = color(red(this.color), green(this.color), blue(this.color), this.fade); // add alpha value
 
 
@@ -216,9 +238,9 @@ function Ball(data) {
 
 
           // Change alpha transparency the higher it goes
-          this.fade = map(-this.y, 0, 600, 200, 25); // 200 = 80% start, 12 = 5% min
-          this.fade = Math.max(this.fade, 25); // don't let it completely fade out if it goes mega hight
-          this.faded = color(red(this.color), green(this.color), blue(this.color), this.fade); // add alpha value
+          this.fade = map(-this.y, 0, 600, 0.8, 0.1); // 200 = 80% start, 12 = 5% min
+          this.fade = Math.max(this.fade, 0.1); // don't let it completely fade out if it goes mega hight
+          this.faded = color(this.h, this.s, this.b, this.fade); // add alpha value
 
           // Draw placeholder ball
           fill(this.faded); // same color, just with alpha to make it look faded out a bit
@@ -236,7 +258,7 @@ function Ball(data) {
             }
 
             bounce_record = -this.y;
-            fill(255, 215, 0); // gold color if we're breaking the bounce record
+            fill(51, 100, 100); // gold color if we're breaking the bounce record
             textSize(13);
             text("New Record!", this.x, this.d/2 + 36);
           } else {

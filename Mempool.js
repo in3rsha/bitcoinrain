@@ -53,7 +53,7 @@ function Mempool() {
     // fill(0, 54, 112);
     // fill(0, 76, 109);
     // fill(0, 109, 144);
-    this.mempoolfill = fill(0, 96, 131); // #006083
+    this.mempoolfill = fill(195, 100, 66);
     this.mempoolbox = rect(this.x, this.y, this.width, this.y + this.length);
     // box.mousePressed(changeGrey);
     stroke(0);
@@ -62,14 +62,13 @@ function Mempool() {
 
     // Title
     noStroke();
-    fill(0, 24, 50);
+    fill(195, 100, 20);
     textSize(32);
     textAlign(LEFT);
     text("mempool", 10, this.y + 40);
 
     // Mempool Size
-    //fill(0, 89, 186);
-    fill(0, 24, 50);
+    fill(195, 100, 20);
     textSize(22);
     textAlign(LEFT);
     size_mb = (this.size / 1000 / 1000).toFixed(2);
@@ -77,7 +76,7 @@ function Mempool() {
 
     // Mempool Count
     //fill(0, 89, 186);
-    fill(0, 24, 50);
+    fill(195, 100, 20);
     textSize(this.textsize);
     textAlign(CENTER);
     text(this.count, windowWidth/2, this.y + ((windowHeight - this.height) / 2 ));
@@ -85,9 +84,9 @@ function Mempool() {
     // Block Count
     textSize(14);
     if (block_count == 0) {
-      fill(150);        // grey if no blocks arrived
+      fill(0, 0, 69);      // grey if no blocks arrived
     } else {
-      fill(0, 255, 0); // green if blocks have passed through
+      fill(120, 100, 100); // green if blocks have passed through
     }
     text(block_count + " Blocks Mined", windowWidth/2, this.y + this.length - 6);
   }

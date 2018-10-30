@@ -7,7 +7,7 @@ var problem = false;
 var problem_message;
 
 // Style
-var bg = 55;
+var bg = 22;
 
 // Meters
 var tx_total_value = 0;
@@ -25,8 +25,8 @@ var donate; // donate box dom element handle
 var donate_show = false;
 var donations_threshold = Math.floor(Math.random() * (10 - 5)) + 5; // random number between 5 and 10?
 var clicks = 0; // click counter
-var donate_grey = 121; // starting color (grey) of font
-var donate_grey_reduce = 4; // how many degrees to fade grey out per click
+var donate_grey = 50; // starting color (grey) of font
+var donate_grey_reduce = 2; // how many degrees to fade grey out per click
 var donations_incoming = 0;
 var donate_x;
 var donate_y;
@@ -47,7 +47,6 @@ var price = {};
 var currency_select = 1;
 var price_array = [];
 var currency_array = []; // match indexes with price_array - [ ] can do better than having 2 separate arrays for this
-var currency_color = 151;
 
 // Sound
 var sound;
@@ -62,6 +61,9 @@ function preload() { // preload stuff (before setup() and all other p5 stuff)
 }
 
 function setup() {
+
+    // Color
+    colorMode(HSB); // 360, 100, 100, 1
 
     // Canvas
     var myCanvas = createCanvas(windowWidth, windowHeight);
@@ -80,7 +82,7 @@ function setup() {
     donate = select("#donate");
     donate.style("width", "400px");
     donate.style("font-family", myFont);
-    donate.style("color", "rgb("+donate_grey+", "+donate_grey+", "+donate_grey+")");
+    donate.style("color", "hsb(0, 0, "+donate_grey+")");
     donate_x = windowWidth/2 - 200;
     donate_y = windowHeight/2 - 100;
     donate.position(donate_x, donate_y);
@@ -186,11 +188,11 @@ function setup() {
 
 function draw() {
     // Redraw background constantly
-    background(bg); // Single Color Hue website background = 46
+    background(0, 0, bg); // Single Color Hue website background = 46
 
     // Problem?
     if (problem) {
-      fill(255, 0, 50);
+      fill(0, 100, 100); // red
       textSize(28);
       textAlign(CENTER);
       text(problem_message, windowWidth/2, 56);
@@ -198,7 +200,7 @@ function draw() {
 
     // Logo
     noStroke();
-    fill(21);
+    fill(0, 0, 8);
     textSize(56);
     textAlign(CENTER);
     text("bitcoinrain", windowWidth/2, windowHeight/2);
@@ -209,7 +211,7 @@ function draw() {
     text(tps + " tx/s", windowWidth/2, (windowHeight/2)+36);   // p5js time since program started
 
     // btc/s
-    fill(currency_color);
+    fill(0, 0, 59);
     textSize(22);
     textAlign(RIGHT);
     //total_btc = (tx_total_value / 100000000);
@@ -225,7 +227,7 @@ function draw() {
     text(currency_per_s + " " + currency_array[currency_select] + "/s", width - 10, mempool.y - 10);
 
     // kb/s
-    fill(21);
+    fill(0, 0, 8);
     textSize(22);
     textAlign(LEFT);
     kb_per_s = (tx_total_size / 1000 / (millis() / 1000)).toFixed(2);
@@ -364,7 +366,7 @@ function draw() {
       donate_show = true;
 
       // Hide donation box once it has fully faded out
-      if (donate_grey == bg) {
+      if (donate_grey <= bg) {
         donate_show = false;
         donate.hide();
       }
@@ -373,7 +375,7 @@ function draw() {
 
     if (donate_show) {
       // Try Donating message
-      fill(donate_grey);
+      fill(0, 0, donate_grey);
       textSize(15);
       textAlign(CENTER);
       text("Try Donating!", windowWidth/2, donate_y + 40);
@@ -517,7 +519,7 @@ function touchStarted() { // touch for mobiles (will use mousePressed instead if
     if (donate_show) {
       donate_grey = donate_grey - donate_grey_reduce; // reduce lightness
       donate_grey = Math.max(donate_grey, bg); // don't fade darker than the background color
-      donate.style("color", "rgb("+donate_grey+", "+donate_grey+", "+donate_grey+")"); // update font color
+      donate.style("color", "hsl(0, 0, "+donate_grey+")"); // update font color
     }
 }
 
@@ -525,13 +527,11 @@ function mouseWheel(event) {
   if (event.delta > 0) {
     if (currency_select < currency_array.length -1) { // do not scroll beyond the length of the array
       currency_select += 1; // select a different currency from the array
-      // currency_color = random(150, 255); // change color of currency
     }
   }
   if (event.delta < 0) {
     if (currency_select > 0) { // do not scroll beyond the first element in the array
       currency_select -= 1; // select a different currency from the array
-      // currency_color = random(150, 255); // // change color of currency
     }
   }
 }
