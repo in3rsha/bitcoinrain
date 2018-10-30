@@ -375,11 +375,40 @@ function draw() {
     mempool.show();
     mempool.update(); // update the top height of box based on number of txs in the mempool
 
-    if (mempool.expanded === true) { // Move mempool up on mousePressed
-      mempool.expand();
-    }
-    if (mempool.expanded === false) { // Move mempool down on mousePressed
+    // Blockchain
+    blockchain.show();
+    blockchain.update(); // update the width when canvas expands
+
+    // Mempool Not Expanded
+    if (mempool.expanded === false) {
       mempool.contract();
+    }
+
+    // Mempool Expanded
+    else {
+      mempool.expand(); // sets mempool.expansion_complete=true when done
+
+      // Only activate raising and "lowering" of the boxes when mempool expansion has finished
+      if (mempool.expanded_complete) {
+
+        // Mempool Raising
+        if (mempool.raised === false) {
+          mempool.lower();
+        }
+        else {
+          mempool.raise();
+        }
+
+        // Blockchain Raising
+        if (blockchain.raised === false) {
+          blockchain.lower();
+        }
+        else {
+          blockchain.raise();
+        }
+
+      }
+
     }
 
 
@@ -430,7 +459,7 @@ function touchStarted() { // touch for mobiles (will use mousePressed instead if
       // |_______|
 
       mempool.expanded = true;
-      console.log("mempool expanded");
+      console.log("mempool.expanded=true");
     }
 
     else {
@@ -443,8 +472,8 @@ function touchStarted() { // touch for mobiles (will use mousePressed instead if
 
         mempool.raised = false;     // lower it
         blockchain.raised = false;  // lower it
-        console.log("mempool lowered");
-        console.log("blockchain lowered");
+        console.log("mempool.raised=false");
+        console.log("blockchain.raised=false");
       }
       else {
         //  _______
@@ -462,8 +491,8 @@ function touchStarted() { // touch for mobiles (will use mousePressed instead if
 
           mempool.raised = true;
           blockchain.raised = true;
-          console.log("mempool raised");
-          console.log("blockchain raised");
+          console.log("mempool.raised=true");
+          console.log("blockchain.raised=true");
         }
         else {
           //  _______
@@ -473,7 +502,7 @@ function touchStarted() { // touch for mobiles (will use mousePressed instead if
           // |__mem__|
 
           mempool.expanded = false;
-          console.log("mempool unexpanded");
+          console.log("mempool.expanded=false");
         }
       }
     }
@@ -510,12 +539,23 @@ function mouseWheel(event) {
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 
+  // Keep expanded boxes at their final resting position when canvas is being resized
   if (mempool.expanded == false) {
     mempool.y = mempool.closed; // Down not show the mempool at any time if it is not active
   }
 
   if (mempool.expanded == true) {
-    mempool.y = mempool.height; // Keep the mempool at its maximum position
+    mempool.y = mempool.height;
+
+    if (mempool.raised == true) {
+      blockchain.y = windowHeight - blockchain.height;
+      mempool.y = blockchain.y - mempool.length;
+    }
+
+    if (mempool.raised == false) {
+      blockchain.y = windowHeight;
+      mempool.y = blockchain.y - mempool.length;
+    }
   }
 }
 

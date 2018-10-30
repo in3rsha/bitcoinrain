@@ -6,6 +6,9 @@ function Mempool() {
   this.count = 0;
   this.count_max = 20000; // the max size of the mempool before its display is at its maximum height
 
+  // Font Size (for the count)
+  this.textsize = 0;
+
   // Bytes
   this.size = 0; // bytes
   this.size_max = 40 * 1000 * 1000; // 40MB
@@ -14,6 +17,9 @@ function Mempool() {
   this.expanded = false;
   this.raised = false;
 
+  // Transition
+  this.expanded_complete = false;
+
   // Box
   this.x = 0;
   this.width = windowWidth;
@@ -21,13 +27,11 @@ function Mempool() {
   this.max = windowHeight / 10;  // percentage of the screen when mempool is "full"
   this.min = windowHeight / 1.15; // percentage of the screen when mempool is empty
   this.height = map(this.size, 0, this.size_max, this.min, this.max); // map mempool size to between the min and max values
-  if (this.height < this.max) {
-    this.height = this.max; // prevent the height from exceeding the maximum height due to exceeding the mapping
-  }
+  this.height = Math.max(this.height, this.max); // prevent the height from exceeding the maximum height due to exceeding the mapping
   this.length = windowHeight - this.height; // the total length of the mempool box (for use when positioning text in the center of it)
-  this.closed = windowHeight; // the y position of the top of the mempool when it is closed (not toggled)
+  this.base = windowHeight; // the y position of the top of the mempool when it is closed (not toggled)
 
-  this.y = this.closed; // starting y position for the top of the mempool (closed)
+  this.y = this.base; // starting y position for the top of the mempool (closed)
 
   //this.ratio = map(this.count, 0, 100000, 1.2, 10);
   //this.ratio = 1.33;
@@ -70,7 +74,6 @@ function Mempool() {
     // Mempool Count
     //fill(0, 89, 186);
     fill(0, 24, 50);
-    this.textsize = map(windowHeight - this.y, 0, windowHeight - this.height, 16, 42); // scale size of text based on size of mempool box
     textSize(this.textsize);
     textAlign(CENTER);
     text(this.count, windowWidth/2, this.y + ((windowHeight - this.height) / 2 ));
@@ -92,21 +95,38 @@ function Mempool() {
     } else {
       this.y = this.height;
       this.velocity = 0;
+      this.expanded_complete = true;
     }
+
+    this.textsize = map(windowHeight - this.y, 0, windowHeight - this.height, 16, 42); // scale size of text based on size of mempool box
     // Update the height of the mempool box
     //this.height = windowHeight - this.y;
   }
 
   this.contract = function() {
-    if (this.y < this.closed) { // if bar is below the top point
+    this.expanded_complete = false;
+
+    if (this.y < this.base) { // if top of box is above its base
       this.velocity += this.gravity;
       this.y += this.velocity;
     } else {
-      this.y = this.closed;
+      this.y = this.base;
       this.velocity = 0;
     }
+
+    this.textsize = map(windowHeight - this.y, 0, windowHeight - this.height, 16, 42); // scale size of text based on size of mempool box
     // Update the height of the mempool box
     //this.height = windowHeight - this.y;
+  }
+
+  this.raise = function() {
+    this.y = blockchain.y - this.length;
+    // this.base = blockchain.y;
+  }
+
+  this.lower = function() {
+      this.y = blockchain.y - this.length;
+    // this.base = windowHeight;
   }
 
   this.update = function() {
@@ -117,7 +137,7 @@ function Mempool() {
     this.height = Math.max(this.height, this.max); // prevent the height from exceeding the maximum height due to exceeding the mapping
     this.width = windowWidth;
     this.length = windowHeight - this.height; // the total length of the mempool box (for use when positioning text in the center of it)
-    this.closed = windowHeight; // the y position of the top of the mempool when it is closed (not toggled)
+    this.base = windowHeight; // the y position of the top of the mempool when it is closed (not toggled)
   }
 
   this.clicked = function() {
