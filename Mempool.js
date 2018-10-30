@@ -7,7 +7,7 @@ function Mempool() {
   this.count_max = 20000; // the max size of the mempool before its display is at its maximum height
 
   // Font Size (for the count)
-  this.textsize = 0;
+  this.textsize = 42;
 
   // Bytes
   this.size = 0; // bytes
@@ -102,7 +102,8 @@ function Mempool() {
     }
 
     // scale size of text based on size of mempool box
-    this.textsize = map(windowHeight - this.y, 0, windowHeight - this.height, 16, 42);
+    //this.textsize = map(windowHeight - this.y, 0, windowHeight - this.height, 16, 42);
+    this.textsize = 42;
   }
 
   this.contract = function() {
@@ -116,7 +117,9 @@ function Mempool() {
       this.velocity = 0;
     }
 
-    this.textsize = map(windowHeight - this.y, 0, windowHeight - this.height, 16, 42); // scale size of text based on size of mempool box
+    //this.textsize = map(windowHeight - this.y, 0, windowHeight - this.height, 16, 42); // scale size of text based on size of mempool box
+    this.textsize = 42;
+
     // Update the height of the mempool box
     //this.height = windowHeight - this.y;
   }

@@ -384,6 +384,7 @@ function draw() {
     // Mempool Not Expanded
     if (mempool.expanded === false) {
       mempool.contract();
+      blockchain.lower();
     }
 
     // Mempool Expanded
