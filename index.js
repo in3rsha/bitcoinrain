@@ -297,6 +297,15 @@ function draw() {
         }
     }
 
+
+    // Mempool
+    mempool.show();
+    mempool.update(); // update the top height of box based on number of txs in the mempool
+
+    // Blockchain
+    blockchain.show();
+    blockchain.update(); // update the width when canvas expands
+
     // Blocks
     // Regulator
     if (millis() > next_block) { // millis() = time since program started
@@ -369,15 +378,6 @@ function draw() {
       textAlign(CENTER);
       text("Try Donating!", windowWidth/2, donate_y + 40);
     }
-
-
-    // Mempool
-    mempool.show();
-    mempool.update(); // update the top height of box based on number of txs in the mempool
-
-    // Blockchain
-    blockchain.show();
-    blockchain.update(); // update the width when canvas expands
 
     // Mempool Not Expanded
     if (mempool.expanded === false) {
