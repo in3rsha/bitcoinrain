@@ -188,7 +188,7 @@ function Ball(data) {
         // text(this.elasticity, this.x, this.y+40);
     }
 
-    this.update = function(mempool) {
+    this.update = function() {
         // this.y += 2;
 
         // drop

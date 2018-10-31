@@ -1,8 +1,12 @@
 // Block Object
 function Block(data) {
 
+    // counting
+    this.counted = false; // do not add me to any counters if I have already been counted
+
 		// diameter
-    this.d = map(data.size, 0, 2000000, 10, 280, true) // 2MB
+    this.d = map(data.size, 0, 1600000, 20, 180, true) // 1.6MB is max size
+    this.strokewidth = 4;
 
     // position
     this.x = width/2 - this.d/2; // center the block
@@ -18,40 +22,69 @@ function Block(data) {
     this.chained = false; // switch to indicate if a block has hit the stack yet
 
     // color
-    this.r = 100;
-    this.g = 100;
-    this.b = 100;
+    //this.r = 100;
+    //this.g = 100;
+    //this.b = 100;
 
     this.show = function() {
-    		strokeWeight(4);
+    		strokeWeight(this.strokewidth);
 				stroke(0);
-        fill(this.r);
+        fill(mempool.c); // use same color as mempool
         rect(this.x, this.y, this.d, this.d);
 
-        if (data.size > 10000) {
+        // Details
+
+        // Size (MB)
+        if (data.size > 10) {
             fill(0);
-            textSize(15);
+            textSize(16);
+            noStroke();
+            textAlign(RIGHT);
+
+						sizemb = (data.size/1000/1000).toFixed(2);
+            text(sizemb + " MB", this.x - this.strokewidth*2, this.y + this.d - this.strokewidth*2)
+        }
+
+        // Tx Count
+        if (data.size > 10) {
+            fill(0);
+            textSize(20);
             noStroke();
             textAlign(CENTER);
 
-						sizemb = (data.size/1000/1000).toFixed(2);
-            text(sizemb + " MB", this.x + this.d/2, this.y + this.d/2)
+            text(data.txcount, this.x + this.d/2, this.y + this.d/2)
+        }
+
+        // Time
+        if (data.size > 10) {
+            fill(22);
+            textSize(18);
+            noStroke();
+            textAlign(LEFT);
+
+            text((fancyTimeFormat(unixtime - data.timestamp) + " ago"), this.x + this.d + this.strokewidth*3, this.y + this.d/2)
         }
     }
 
     this.stop = height;
 
-    this.update = function() {
+    this.update = function(hold) {
+        // Canvas Resizing
+        this.x = width/2 - this.d/2; // center the block
+
+        // set default value for whether to hold the block
+        hold = hold || false;
+
         // drop
         this.velocity += this.gravity;
         this.y += this.velocity;
 
-        // bounce
-        if (this.y > this.stop - this.d) {
-          //this.y = this.stop - this.d;
-          //this.velocity = 0; // blocks are drawn from the top left corner, so no need to half it
-          //this.gravity = 0;
-          this.chained = true;
+        // hold
+        if (hold) {
+          if (this.y >= blockchain.y + blockchain.height - this.d - this.strokewidth) { // base of block hitting base of blockchain box
+            this.y = blockchain.y + blockchain.height - this.d - this.strokewidth;
+            this.velocity = 0;
+          }
         }
 
     }

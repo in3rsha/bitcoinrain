@@ -42,6 +42,9 @@ var blocks = [];
 let next_block = 0;
 let interval_block = 1000; // milliseconds between new blocks
 
+// Time
+var unixtime = Math.floor(Date.now() / 1000); // for calculating time since last block
+
 // BTC Prices
 var price = {};
 var currency_select = 1;
@@ -257,16 +260,17 @@ function draw() {
         next_tx += interval_tx;
     }
 
-		// Transactions Show
+		// Transactions
     if (balls.length > 0) { // Display and update live balls if there are any
-        // [x] Constantly draw .show each ball in array
+
+        // Show
         for (i=0; i<balls.length; i++) {
             balls[i].show();
         }
 
-        // [x] Constantly .update each ball in array
+        // Update
         for (i=0; i<balls.length; i++) {
-            balls[i].update(mempool); // Uses mempool so that they know when to bounce
+            balls[i].update(); // Uses mempool so that they know when to bounce
 
             // Do stuff if ball goes past the mempool line
             if (balls[i].y - mempool.y > balls[i].d / 2) { // distance below mempool line > ball radius
@@ -308,6 +312,10 @@ function draw() {
     blockchain.show();
     blockchain.update(); // update the width when canvas expands
 
+    // Update Time
+    unixtime = Math.floor(Date.now() / 1000);
+    // text(unixtime, 24, 16);
+
     // Blocks
     // Regulator
     if (millis() > next_block) { // millis() = time since program started
@@ -326,20 +334,24 @@ function draw() {
     }
 
     for (i=0; i<blocks.length; i++) { // Constantly .update each block in array
-      // stacking
-      // if (i == 0) {
-      //   blocks[i].update();
-      // } else {
-      //   blocks[i].stop = blocks[i-1].y; // set the stopping point
-      //   blocks[i].update(); // stack block on top of previous one's y position
-      // }
-
       // drop
-      blocks[i].update();
+      if (i == blocks.length - 1) { // if this is the most recently added block to the array (last one in array)
+        blocks[i].update(true); // hold the block at the base of the blockchain box
+      }
+      else {
+        blocks[i].update(false); // let box fall
+      }
 
-      // [x] Remove ball from array if runs below bottom of window
-      if (blocks[i].y > windowHeight+100) {
-          block_count += 1;
+      // Count block as mined when it passes top of blockchain boxes
+      if (blocks[i].y > blockchain.y) {
+          if (blocks[i].counted == false) {
+            block_count += 1;
+            blocks[i].counted = true;
+          }
+      }
+
+      // Remove ball from array if runs below bottom of blockchain box
+      if (blocks[i].y > blockchain.y + blockchain.height) {
           blocks.splice(i, 1);
       }
 
@@ -414,10 +426,9 @@ function draw() {
 
     }
 
-
     // Debugging Info
     if (debug) {
-      fill(200);
+      fill(100);
       textSize(16);
       textAlign(LEFT);
 
@@ -557,9 +568,34 @@ function windowResized() {
       blockchain.y = windowHeight;
       mempool.y = blockchain.y - mempool.length;
     }
+
   }
 }
 
 // function mousePressed() {
 //    ...
 // }
+
+// Utility Functions
+function fancyTimeFormat(time)
+{
+    // Hours, minutes and seconds
+    var hrs = ~~(time / 3600);
+    var mins = ~~((time % 3600) / 60);
+    var secs = ~~time % 60;
+
+    // Output like "1:01" or "4:03:59" or "123:03:59"
+    var ret = "";
+
+    if (hrs > 0) {
+        ret += "" + hrs + " hours, " + (mins < 10 ? "0" : "");
+    }
+
+    if (mins > 0) {
+      ret += "" + mins + " mins, " + (secs < 10 ? "0" : "");
+    }
+
+    ret += "" + secs + " secs";
+
+    return ret;
+}
