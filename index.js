@@ -146,15 +146,15 @@ function setup() {
         }
 
         if (json.type == 'block') {
-          if (focused) {
+          // if (focused) {
         	   block = new Block(json);
         	   blocks_waiting.push(block);
-          }
+          // }
 
           // Add to meters while away
-          if (!focused) {
-          	block_count += 1; // tx/s
-          }
+          // if (!focused) {
+          //	block_count += 1; // tx/s
+          // }
         }
 
         if (json.type == 'mempool') {
