@@ -81,8 +81,8 @@ function Block(data) {
 
         // hold
         if (hold) {
-          if (this.y >= blockchain.y + blockchain.height - this.d - this.strokewidth) { // base of block hitting base of blockchain box
-            this.y = blockchain.y + blockchain.height - this.d - this.strokewidth;
+          if (this.y >= blockchain.y + blockchain.height - this.d - this.strokewidth/2) { // base of block hitting base of blockchain box
+            this.y = blockchain.y + blockchain.height - this.d - this.strokewidth/2;
             this.velocity = 0;
           }
         }

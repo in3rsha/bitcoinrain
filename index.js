@@ -209,20 +209,14 @@ function draw() {
     text("bitcoinrain", windowWidth/2, windowHeight/2);
 
     // tx/s
-    tps = (tx_count / (millis() / 1000)).toFixed(1);
+    tps = (tx_count / (millis() / 1000)).toFixed(1); // millis() = p5js time since program started
     textSize(26);
-    text(tps + " tx/s", windowWidth/2, (windowHeight/2)+36);   // p5js time since program started
+    text(tps + " tx/s", windowWidth/2, (windowHeight/2)+36);
 
     // btc/s
     fill(0, 0, 59);
     textSize(22);
     textAlign(RIGHT);
-    //total_btc = (tx_total_value / 100000000);
-    //btc_per_s = (total_btc / (millis() / 1000)).toFixed(2);
-    //text(btc_per_s + " BTC/s", width - 10, mempool.y - 10);
-
-    //total_usd = total_btc * price.USD;
-    //usd_per_s = (total_usd / (millis() / 1000)).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'); // .replace code adds commas
 
     // price_per_s (based on selected currency on mouseWhel, using an array of currency values)
     total_in_currency = (tx_total_value / 100000000) * price_array[currency_select]; // using chosen currency to display
@@ -314,7 +308,6 @@ function draw() {
 
     // Update Time
     unixtime = Math.floor(Date.now() / 1000);
-    // text(unixtime, 24, 16);
 
     // Blocks
     // Regulator
@@ -342,17 +335,17 @@ function draw() {
         blocks[i].update(false); // let box fall
       }
 
-      // Count block as mined when it passes top of blockchain boxes
+      // Block Passes Top of Blockchain Box
       if (blocks[i].y > blockchain.y) {
           if (blocks[i].counted == false) {
-            block_count += 1;
+            block_count += 1; // count block as mined
             blocks[i].counted = true;
           }
       }
 
-      // Remove ball from array if runs below bottom of blockchain box
+      // Block Passes Bottom of Blockchain Box
       if (blocks[i].y > blockchain.y + blockchain.height) {
-          blocks.splice(i, 1);
+          blocks.splice(i, 1); // remove block from array
       }
 
     }
@@ -460,11 +453,8 @@ function draw() {
 }
 
 function touchStarted() { // touch for mobiles (will use mousePressed instead if this is not defined)
-    // mempool.expanded = !mempool.expanded; // toggle true/false
-    // mempool.velocity = 4;
 
     // State
-
     if (mempool.expanded == false) {
       //  _______
       // |       |
@@ -473,7 +463,7 @@ function touchStarted() { // touch for mobiles (will use mousePressed instead if
       // |_______|
 
       mempool.expanded = true;
-      console.log("mempool.expanded=true");
+      // console.log("mempool.expanded=true");
     }
 
     else {
@@ -486,8 +476,8 @@ function touchStarted() { // touch for mobiles (will use mousePressed instead if
 
         mempool.raised = false;     // lower it
         blockchain.raised = false;  // lower it
-        console.log("mempool.raised=false");
-        console.log("blockchain.raised=false");
+        // console.log("mempool.raised=false");
+        // console.log("blockchain.raised=false");
       }
       else {
         //  _______
@@ -505,8 +495,8 @@ function touchStarted() { // touch for mobiles (will use mousePressed instead if
 
           mempool.raised = true;
           blockchain.raised = true;
-          console.log("mempool.raised=true");
-          console.log("blockchain.raised=true");
+          // console.log("mempool.raised=true");
+          // console.log("blockchain.raised=true");
         }
         else {
           //  _______
@@ -516,13 +506,10 @@ function touchStarted() { // touch for mobiles (will use mousePressed instead if
           // |__mem__|
 
           mempool.expanded = false;
-          console.log("mempool.expanded=false");
+          // console.log("mempool.expanded=false");
         }
       }
     }
-
-    // Mempool clicked?
-    // console.log(mempool.clicked());
 
     // Increment Click Counter (do stuff after number of clicks)
     clicks++;
