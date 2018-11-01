@@ -25,8 +25,8 @@ var donate; // donate box dom element handle
 var donate_show = false;
 var donations_threshold = Math.floor(Math.random() * (10 - 5)) + 5; // random number between 5 and 10?
 var clicks = 0; // click counter
-var donate_grey = 50; // starting color (grey) of font
-var donate_grey_reduce = 2; // how many degrees to fade grey out per click
+var donate_opacity = 1;
+var donate_opacity_reduce = 0.05
 var donations_incoming = 0;
 var donate_x;
 var donate_y;
@@ -85,11 +85,10 @@ function setup() {
     donate = select("#donate");
     donate.style("width", "400px");
     donate.style("font-family", myFont);
-    donate.style("color", "hsb(0, 0, "+donate_grey+")");
+    donate.style("color", "#999"); // ccc = 80 brightness, bbb=73, aaa=67, 999=60
     donate_x = windowWidth/2 - 200;
     donate_y = windowHeight/2 - 100;
     donate.position(donate_x, donate_y);
-    // donate.center();
 
     // Attach callback function to websocket event in the setup...
     var ws = new WebSocket(websocket_uri);
@@ -370,7 +369,7 @@ function draw() {
       donate_show = true;
 
       // Hide donation box once it has fully faded out
-      if (donate_grey <= bg) {
+      if (donate_opacity <= 0) {
         donate_show = false;
         donate.hide();
       }
@@ -379,7 +378,7 @@ function draw() {
 
     if (donate_show) {
       // Try Donating message
-      fill(0, 0, donate_grey);
+      fill(0, 0, 60, donate_opacity); // 60=#999, 67=#aaa, 73=#bbb, 80=#ccc
       textSize(15);
       textAlign(CENTER);
       text("Try Donating!", windowWidth/2, donate_y + 40);
@@ -515,9 +514,8 @@ function touchStarted() { // touch for mobiles (will use mousePressed instead if
 
     // Donations Box - Reduce lightness so it fades out on each click
     if (donate_show) {
-      donate_grey = donate_grey - donate_grey_reduce; // reduce lightness
-      donate_grey = Math.max(donate_grey, bg); // don't fade darker than the background color
-      donate.style("color", "hsl(0, 0, "+donate_grey+")"); // update font color
+      donate_opacity -= donate_opacity_reduce;
+      donate.style("opacity", donate_opacity); // update font opacity
     }
 }
 

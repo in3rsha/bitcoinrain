@@ -1,5 +1,6 @@
 function Blockchain(data) {
   this.raised = false;
+  this.raising = false;
 
   this.velocity = 12;
 
@@ -34,9 +35,11 @@ function Blockchain(data) {
   this.raise = function() {
     if (this.y > windowHeight - this.height) {
       this.y -= this.velocity;
+      this.raising = true;
     }
     else {
       this.y = windowHeight - this.height;
+      this.raising = false;
     }
   }
 

@@ -88,6 +88,7 @@ function Mempool() {
     } else {
       this.y = this.height;
       this.velocity = 0;
+      
       this.expanded_complete = true;
     }
 
