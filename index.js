@@ -538,6 +538,10 @@ function keyPressed() {
     show_values = !show_values;
   }
 
+  if (keyCode === SHIFT) {
+    debug = !debug;
+  }
+
   if (keyCode === DOWN_ARROW) {
     if (currency_select < currency_array.length -1) { // do not scroll beyond the length of the array
       currency_select += 1; // select a different currency from the array
