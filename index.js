@@ -9,6 +9,9 @@ var problem_message;
 // Style
 var bg = 22;
 
+// Display
+var show_values = false; // toggle btc price of each ball on/off with ENTER Key
+
 // Meters
 var tx_total_value = 0;
 var tx_total_size = 0;
@@ -556,6 +559,11 @@ function windowResized() {
   // If Mempool is not expanded
   else {
     blockchain.y = windowHeight; // always keep blockchain box lowered
+  }
+}
+function keyPressed() {
+  if (keyCode === ENTER) {
+    show_values = !show_values;
   }
 }
 

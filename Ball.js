@@ -50,12 +50,13 @@ function Ball(data) {
 
     // Blue (Normal)
     this.h = 195;
-    this.s = 100;
+    // this.s = 100;
+    this.s = map(data.value, 0, 10000000000, 50, 100, true); // map saturation based on value (0BTC to 100BTC)
     this.b = 100;
 
     // Purple (Segwit)
     if (data.segwit !== false)  {
-      this.h = 288;
+      this.h = 283; // green=105, purple=288
     }
 
     // Gold (Donation)
@@ -87,7 +88,7 @@ function Ball(data) {
 
         // Put size (kb) inside ball
         if (this.d > 50) { // ...only if it's big enough
-            fill(255);
+            fill(0);
             textSize(13);
             textAlign(CENTER);
 
@@ -96,14 +97,21 @@ function Ball(data) {
 
         // Put donation message outside ball
         if (data.donation == true) {
-            fill(255);
+            fill(100);
             textSize(13);
             textAlign(LEFT);
             text("Thanks!", this.x + this.d + 2, this.y + 4);
         }
 
+        // Put donation message outside ball
+        if (show_values === true) { // show_values is a global variable
+            fill(100);
+            textSize(13);
+            textAlign(LEFT);
+            text(this.btc, this.x+(this.d/2)+6, this.y+4);
+        }
+
         // text(data.size, this.x, this.y-60);
-        // text(data.value, this.x, this.y-40);
         // text(this.elasticity, this.x, this.y+40);
     }
 
