@@ -152,13 +152,13 @@ function Ball(data) {
 
                 // Mempool Expanding?
                 if (mempool.expanded == true) {
-                  this.velocity -= mempool.velocity * this.elasticity; // add velocity of mempool bar
+                  this.velocity -= mempool.velocity; // * this.elasticity; // add velocity of mempool bar
                   // this.gravity *= 3; // increase speed of drop after it has been bounced up
                 }
 
                 // Blockchain/Mempool Raising?
                 if (blockchain.raising === true) {
-                  this.velocity -= blockchain.velocity * this.elasticity; // Mempool moves with blockchain and with same velocity
+                  this.velocity -= blockchain.velocity; // * this.elasticity; // Mempool moves with blockchain and with same velocity
                 }
 
                 this.bounce += 1; // add to bounce count
