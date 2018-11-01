@@ -16,6 +16,9 @@ function Block(data) {
     this.velocity = 0;
     this.gravity  = 0.25;
 
+    // stick
+    this.sticky = false;
+
 		// bounce
     this.elasticity = 0.6 + randomGaussian(0.0, 0.05); // add some noise
     this.bounce = 0; // bounce count
@@ -75,16 +78,22 @@ function Block(data) {
         // set default value for whether to hold the block
         hold = hold || false;
 
-        // drop
-        this.velocity += this.gravity;
-        this.y += this.velocity;
-
-        // hold
-        if (hold) {
-          if (this.y >= blockchain.y + blockchain.height - this.d - this.strokewidth/2) { // base of block hitting base of blockchain box
-            this.y = blockchain.y + blockchain.height - this.d - this.strokewidth/2;
-            this.velocity = 0;
-          }
+        // Keep block stuck to bottom if it is being held and it has already hit the bottom
+        if (hold && this.sticky) {
+          this.y = blockchain.y + blockchain.height - this.d - this.strokewidth/2;
+          this.velocity = 0;
+        }
+        // keep block at bottom if it is being held and hitting the bottom for the first time
+        else if (hold && this.y >= blockchain.y + blockchain.height - this.d - this.strokewidth/2) {
+          this.y = blockchain.y + blockchain.height - this.d - this.strokewidth/2;
+          this.velocity = 0;
+          this.sticky = true; // keep it at bottom next time now that it has hit it (e.g. when resizing canvas)
+        }
+        // drop as normal
+        else {
+          // drop
+          this.velocity += this.gravity;
+          this.y += this.velocity;
         }
 
     }

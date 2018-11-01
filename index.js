@@ -289,14 +289,13 @@ function draw() {
             }
 
             // [x] Remove ball from array if runs below bottom of window
-            if (balls[i].y > windowHeight + (balls[i].r * 2) + 200) {
+            if (balls[i].y > windowHeight) {
                 // Remove ball
                 balls.splice(i, 1);
             }
 
         }
     }
-
 
     // Mempool
     mempool.show();
@@ -399,20 +398,20 @@ function draw() {
       // Only activate raising and "lowering" of the boxes when mempool expansion has finished
       if (mempool.expanded_complete) {
 
+        // Blockchain Raising
+        if (blockchain.raised === false) { // Raise blockchain first because mempool depends on its y position
+          blockchain.lower();
+        }
+        else {
+          blockchain.raise();
+        }
+
         // Mempool Raising
         if (mempool.raised === false) {
           mempool.lower();
         }
         else {
           mempool.raise();
-        }
-
-        // Blockchain Raising
-        if (blockchain.raised === false) {
-          blockchain.lower();
-        }
-        else {
-          blockchain.raise();
         }
 
       }
@@ -555,7 +554,10 @@ function windowResized() {
       blockchain.y = windowHeight;
       mempool.y = blockchain.y - mempool.length;
     }
-
+  }
+  // If Mempool is not expanded
+  else {
+    blockchain.y = windowHeight; // always keep blockchain box lowered
   }
 }
 

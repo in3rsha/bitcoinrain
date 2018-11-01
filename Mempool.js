@@ -27,6 +27,9 @@ function Mempool() {
   // Raising Physics
   this.raise_velocity = 8;
 
+  // Color
+  this.c = color(195, 100, 60);
+
   // Box
   this.x = 0;
   this.width = windowWidth;
@@ -39,23 +42,10 @@ function Mempool() {
 
   this.y = this.base; // starting y position for the top of the mempool (closed)
 
-  //this.ratio = map(this.count, 0, 100000, 1.2, 10);
-  //this.ratio = 1.33;
-  //this.max = windowHeight / this.ratio; // max height of the box
-  //this.min = windowHeight;        // min height of the box
-  //this.y = this.min;              // starting position
-  //this.length = windowHeight - (windowHeight / this.ratio); // the length of the box
-  //this.height = windowHeight - this.y; // the height of the box from the bottom
-
   this.show = function() {
     // Mempool Box
-    // fill(0, 54, 112);
-    // fill(0, 76, 109);
-    // fill(0, 109, 144);
-    this.c = color(195, 100, 60);
     fill(this.c);
-    this.mempoolbox = rect(this.x, this.y, this.width, this.y + this.length);
-    // box.mousePressed(changeGrey);
+    rect(this.x, this.y, this.width, this.y + this.length);
     stroke(0);
     strokeWeight(1);
     line(this.x, this.y, this.width, this.y)
@@ -102,8 +92,7 @@ function Mempool() {
     }
 
     // scale size of text based on size of mempool box
-    //this.textsize = map(windowHeight - this.y, 0, windowHeight - this.height, 16, 42);
-    this.textsize = 42;
+    // this.textsize = map(windowHeight - this.y, 0, windowHeight - this.height, 16, 42);
   }
 
   this.contract = function() {
@@ -117,11 +106,8 @@ function Mempool() {
       this.velocity = 0;
     }
 
-    //this.textsize = map(windowHeight - this.y, 0, windowHeight - this.height, 16, 42); // scale size of text based on size of mempool box
-    this.textsize = 42;
-
-    // Update the height of the mempool box
-    //this.height = windowHeight - this.y;
+    // scale size of text based on size of mempool box
+    // this.textsize = map(windowHeight - this.y, 0, windowHeight - this.height, 16, 42);
   }
 
   this.raise = function() {
