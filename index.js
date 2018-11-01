@@ -551,11 +551,33 @@ function keyPressed() {
 
   if (keyCode === LEFT_ARROW) {
     ball_dimension = 'size';
-    console.log("ball_dimesion='size'");
+
+    // update every ball to let them know they need to switch their dimensions
+    for (i=0; i<balls_waiting.length; i++) {
+        balls_waiting[i].switch_dimension = true;
+    }
+
+    for (i=0; i<balls.length; i++) {
+        balls[i].switch_dimension = true;
+    }
+
+    //ball_dimension_switch = true; // every ball needs to update its dimensions
+    //console.log("ball_dimesion='size'");
   }
   if (keyCode === RIGHT_ARROW) {
     ball_dimension = 'value';
-    console.log("ball_dimesion='value'")
+
+    // update every ball to let them know they need to switch their dimensions
+    for (i=0; i<balls_waiting.length; i++) {
+        balls_waiting[i].switch_dimension = true;
+    }
+
+    for (i=0; i<balls.length; i++) {
+        balls[i].switch_dimension = true;
+    }
+
+    //ball_dimension_switch = true; // every ball needs to update its dimensions
+    //console.log("ball_dimesion='value'")
   }
 }
 

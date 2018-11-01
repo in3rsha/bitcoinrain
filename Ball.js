@@ -11,7 +11,9 @@ function Ball(data) {
     txid_decimal = parseInt(txid_slice, 16); // convert hex to decimal
     this.x = txid_decimal % windowWidth; // randomly position modulo the width of the window
 
-    // diameter (map based on its value in satoshis or size in bytes)
+    // dimensions
+    this.switch_dimension = false; // switch to indicate that we need to change this ball's dimensions during the update() function
+
     if (ball_dimension == 'size') {
       this.d = map(data.size, 190, 30000, 10, 160, true)        // size - 190 (1+1) to 30,000 bytes (214 inputs+outputs)
     }
@@ -118,6 +120,18 @@ function Ball(data) {
 
         // currency - keep updating incase selected currency changes
         this.currency = (data.value/100000000 * price_array[currency_select]).toFixed(2);
+
+        // If a switch between bytes to value is made, update the ball dimensions
+        if (this.switch_dimension === true) { // switch turned on by changing from size to value (preventing us from constantly having to set the size of the ball)
+          if (ball_dimension == 'size') {
+            this.d = map(data.size, 190, 30000, 10, 160, true)        // size - 190 (1+1) to 30,000 bytes (214 inputs+outputs)
+          }
+          if (ball_dimension == 'value') {
+            this.d = map(data.value, 0, 20000000000, 10, 160, true)    // value - 200 btc max
+          }
+
+          this.switch_dimension = false; // turn off switch so that we're not constantly setting the diameter
+        }
 
         // drop
         this.velocity += this.gravity;
