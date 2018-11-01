@@ -51,7 +51,7 @@ function Ball(data) {
     // Blue (Normal)
     this.h = 195;
     // this.s = 100;
-    this.s = map(data.value, 0, 10000000000, 50, 100, true); // map saturation based on value (0BTC to 100BTC)
+    this.s = map(data.value, 0, 10000000000, 80, 100, true); // map saturation based on value (0BTC to 100BTC)
     this.b = 100;
 
     // Purple (Segwit)
