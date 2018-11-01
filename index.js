@@ -10,7 +10,8 @@ var problem_message;
 var bg = 22;
 
 // Display
-var show_values = false; // toggle btc price of each ball on/off with ENTER Key
+var show_values = true; // toggle btc price of each ball on/off with ENTER Key
+var ball_dimension = 'value';
 
 // Meters
 var tx_total_value = 0;
@@ -546,6 +547,15 @@ function keyPressed() {
     if (currency_select > 0) { // do not scroll beyond the first element in the array
       currency_select -= 1; // select a different currency from the array
     }
+  }
+
+  if (keyCode === LEFT_ARROW) {
+    ball_dimension = 'size';
+    console.log("ball_dimesion='size'");
+  }
+  if (keyCode === RIGHT_ARROW) {
+    ball_dimension = 'value';
+    console.log("ball_dimesion='value'")
   }
 }
 

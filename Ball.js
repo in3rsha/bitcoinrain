@@ -12,8 +12,12 @@ function Ball(data) {
     this.x = txid_decimal % windowWidth; // randomly position modulo the width of the window
 
     // diameter (map based on its value in satoshis or size in bytes)
-    // this.d = map(data.value, 0, 20000000000, 10, 160, true) // value - 200 btc max
-    this.d = map(data.size, 190, 30000, 10, 160, true)        // size - 190 (1+1) to 30,000 bytes (214 inputs+outputs)
+    if (ball_dimension == 'size') {
+      this.d = map(data.size, 190, 30000, 10, 160, true)        // size - 190 (1+1) to 30,000 bytes (214 inputs+outputs)
+    }
+    if (ball_dimension == 'value') {
+      this.d = map(data.value, 0, 20000000000, 10, 160, true)    // value - 200 btc max
+    }
 
     // counting
     this.counted = false; // do not add me to any counters if I have already been counted
@@ -78,22 +82,23 @@ function Ball(data) {
         fill(this.color);
         ellipse(this.x, this.y, this.d, this.d);
 
-        // Put value inside ball
-        // if (this.btc > 10) { // ...only if it's big enough
-        //     fill(255);
-        //     textSize(13);
-        //     textAlign(CENTER);
-        //
-        //     text(this.btc, this.x, this.y+5)
-        // }
-
-        // Put size (kb) inside ball
-        if (this.d > 50) { // ...only if it's big enough
-            fill(0);
+        if (show_values === true) { // show_values is a global variable (controlled by ENTER)
+          // Put size (kb) inside ball
+          if (ball_dimension == 'size') { // ...only if it's big enough
+            fill(0); // black for bytes
             textSize(13);
-            textAlign(CENTER);
+            textAlign(LEFT);
 
-            text(this.size_kb + "kb", this.x, this.y+5)
+            text(this.size_kb + " kb", this.x+(this.d/2)+6, this.y+4)
+          }
+
+          if (ball_dimension == 'value') { // show_values is a global variable
+            fill(59); // grey for value
+            textSize(13);
+            textAlign(LEFT);
+            text(this.currency.replace(/\d(?=(\d{3})+\.)/g, '$&,') + " " + currency_array[currency_select], this.x+(this.d/2)+6, this.y+4);
+          }
+
         }
 
         // Put donation message outside ball
@@ -104,13 +109,6 @@ function Ball(data) {
             text("Thanks!", this.x + this.d + 2, this.y + 4);
         }
 
-        // Put donation message outside ball
-        if (show_values === true) { // show_values is a global variable
-            fill(90);
-            textSize(13);
-            textAlign(LEFT);
-            text(this.currency.replace(/\d(?=(\d{3})+\.)/g, '$&,') + " " + currency_array[currency_select], this.x+(this.d/2)+6, this.y+4);
-        }
 
         // text(data.size, this.x, this.y-60);
         // text(this.elasticity, this.x, this.y+40);
