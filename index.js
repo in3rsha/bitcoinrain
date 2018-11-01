@@ -522,6 +522,23 @@ function touchStarted() { // touch for mobiles (will use mousePressed instead if
     }
 }
 
+function keyPressed() {
+  if (keyCode === ENTER) {
+    show_values = !show_values;
+  }
+
+  if (keyCode === DOWN_ARROW) {
+    if (currency_select < currency_array.length -1) { // do not scroll beyond the length of the array
+      currency_select += 1; // select a different currency from the array
+    }
+  }
+  if (keyCode === UP_ARROW) {
+    if (currency_select > 0) { // do not scroll beyond the first element in the array
+      currency_select -= 1; // select a different currency from the array
+    }
+  }
+}
+
 function mouseWheel(event) {
   if (event.delta > 0) {
     if (currency_select < currency_array.length -1) { // do not scroll beyond the length of the array
@@ -559,11 +576,6 @@ function windowResized() {
   // If Mempool is not expanded
   else {
     blockchain.y = windowHeight; // always keep blockchain box lowered
-  }
-}
-function keyPressed() {
-  if (keyCode === ENTER) {
-    show_values = !show_values;
   }
 }
 
