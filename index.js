@@ -52,7 +52,8 @@ var unixtime = Math.floor(Date.now() / 1000); // for calculating time since last
 var price = {};
 var currency_select = 1;
 var price_array = [];
-var currency_array = []; // match indexes with price_array - [ ] can do better than having 2 separate arrays for this
+var currency_array = []; // e.g. BTC, USD, GBP - match indexes with price_array - [ ] can do better than having 2 separate arrays for this
+var currency_sign_array = []; // e.g. $, £
 
 // Sound
 var sound;
@@ -186,6 +187,15 @@ function setup() {
           currency_array[5] = "CNY"; // ["GBP", price.GBP];
           currency_array[6] = "CHF"; // ["GBP", price.GBP];
           currency_array[7] = "AUD"; // ["GBP", price.GBP];
+
+          currency_sign_array[0] = "Ƀ"; // ["BTC", 1];
+          currency_sign_array[1] = "$"; // ["USD", price.USD];
+          currency_sign_array[2] = "$"; // ["GBP", price.GBP];
+          currency_sign_array[3] = "€"; // ["GBP", price.GBP];
+          currency_sign_array[4] = "¥"; // ["GBP", price.GBP];
+          currency_sign_array[5] = "¥"; // ["GBP", price.GBP];
+          currency_sign_array[6] = "CHF"; // ["GBP", price.GBP];
+          currency_sign_array[7] = "$"; // ["GBP", price.GBP];
         }
     };
 
@@ -269,7 +279,7 @@ function draw() {
             balls[i].update(); // Uses mempool so that they know when to bounce
 
             // Do stuff if ball goes past the mempool line
-            if (balls[i].y - mempool.y > balls[i].d / 2) { // distance below mempool line > ball radius
+            if (balls[i].y > mempool.y + (balls[i].d/2)) { // distance below mempool line > ball radius
 
                 // Only add balls to meter if they have not already passed the mempool line
                 if (balls[i].counted == false) {
@@ -290,8 +300,8 @@ function draw() {
 
             }
 
-            // [x] Remove ball from array if runs below bottom of window
-            if (balls[i].y > windowHeight) {
+            // [x] Remove ball from array if runs well below mempool line
+            if (balls[i].y > mempool.y + (balls[i].d*2)) {
                 // Remove ball
                 balls.splice(i, 1);
             }

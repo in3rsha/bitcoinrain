@@ -23,6 +23,7 @@ function Ball(data) {
     // value
     this.value = data.value;
     this.btc = (data.value/100000000).toFixed(2); // 2 decimal places
+    this.currency = (data.value/100000000 * price_array[currency_select]).toFixed(2);
 
     // size
     this.size = data.size;
@@ -105,10 +106,10 @@ function Ball(data) {
 
         // Put donation message outside ball
         if (show_values === true) { // show_values is a global variable
-            fill(100);
+            fill(90);
             textSize(13);
             textAlign(LEFT);
-            text(this.btc, this.x+(this.d/2)+6, this.y+4);
+            text(this.currency.replace(/\d(?=(\d{3})+\.)/g, '$&,') + " " + currency_array[currency_select], this.x+(this.d/2)+6, this.y+4);
         }
 
         // text(data.size, this.x, this.y-60);
@@ -116,6 +117,9 @@ function Ball(data) {
     }
 
     this.update = function() {
+
+        // currency - keep updating incase selected currency changes
+        this.currency = (data.value/100000000 * price_array[currency_select]).toFixed(2);
 
         // drop
         this.velocity += this.gravity;
