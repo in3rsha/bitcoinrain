@@ -4,6 +4,11 @@ function Block(data) {
     // counting
     this.counted = false; // do not add me to any counters if I have already been counted
 
+    // mempool updating (block data comes with information about the new size of the mempool)
+    this.mempool_updated = false; // switch to only update the mempool once as the block crosses the mempool line
+    this.mempool_count = data.mempool.count
+    this.mempool_size = data.mempool.size
+
 		// diameter
     this.d = map(data.size, 0, 1600000, 20, 180, true) // 1.6MB is max size
     this.strokewidth = 4;

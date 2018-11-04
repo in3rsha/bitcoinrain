@@ -99,7 +99,7 @@ function setup() {
     var ws = new WebSocket(websocket_uri);
     ws.onmessage = function(s) { // s contains everything about the message
 
-        // [x] parse json data
+        // Parse json data
         json = JSON.parse(s.data);
 
         if (json.type == 'status') {
@@ -161,9 +161,9 @@ function setup() {
           // }
         }
 
-        if (json.type == 'mempool') {
-        	mempool.count = json.count;
-          mempool.size  = json.size;
+        if (json.type == 'mempool') { // mempool message gets sent early so you get a starting state for the mempool
+        	mempool.count = json.count; // set initial mempool count
+          mempool.size  = json.size;  // set initial mempool size
         }
 
         if (json.type == 'prices') {
@@ -345,6 +345,20 @@ function draw() {
       }
       else {
         blocks[i].update(false); // let box fall
+      }
+
+      // Block passes top of mempool box
+      if (blocks[i].y > mempool.y) {
+
+        // Update mempool if it has not already been updated
+        if (blocks[i].mempool_updated == false) {
+          // Blocks come with new information about the size of the mempool, so update mempool as block passes across it
+          mempool.count = blocks[i].mempool_count; // update mempool with information contained in the block
+          mempool.size  = blocks[i].mempool_size;
+
+          // Mark it as counted so it isn't constantly increasing counts
+          blocks[i].mempool_updated = true;
+        }
       }
 
       // Block Passes Top of Blockchain Box
