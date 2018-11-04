@@ -21,6 +21,8 @@ function Ball(data) {
       this.d = map(data.value, 0, 20000000000, 10, 160, true)    // value - 200 btc max
     }
 
+    this.label_size = map(this.d, 10, 160, 13, 28, true);
+
     // counting
     this.counted = false; // do not add me to any counters if I have already been counted
     this.gone_above = false; // keep track of if I have gone above the top of the screen or not
@@ -88,7 +90,7 @@ function Ball(data) {
           // Put size (kb) inside ball
           if (ball_dimension == 'size') { // ...only if it's big enough
             fill(0); // black for bytes
-            textSize(13);
+            textSize(this.label_size);
             textAlign(LEFT);
 
             text(this.size_kb + " kb", this.x+(this.d/2)+6, this.y+4)
@@ -96,7 +98,7 @@ function Ball(data) {
 
           if (ball_dimension == 'value') { // show_values is a global variable
             fill(59); // grey for value
-            textSize(13);
+            textSize(this.label_size);
             textAlign(LEFT);
             text(this.currency.replace(/\d(?=(\d{3})+\.)/g, '$&,') + " " + currency_array[currency_select], this.x+(this.d/2)+6, this.y+4);
           }
@@ -129,6 +131,8 @@ function Ball(data) {
           if (ball_dimension == 'value') {
             this.d = map(data.value, 0, 20000000000, 10, 160, true)    // value - 200 btc max
           }
+
+          this.label_size = map(this.d, 10, 160, 13, 28, true);
 
           this.switch_dimension = false; // turn off switch so that we're not constantly setting the diameter
         }
