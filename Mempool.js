@@ -69,7 +69,7 @@ function Mempool() {
     fill(195, 100, 20);
     textSize(this.textsize);
     textAlign(CENTER);
-    text(this.count, windowWidth/2, this.y + ((windowHeight - this.height) / 2 ));
+    text(this.count.toLocaleString(), windowWidth/2, this.y + ((windowHeight - this.height) / 2 ));
 
     // Block Count
     textSize(14);

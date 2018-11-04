@@ -55,7 +55,7 @@ function Block(data) {
             noStroke();
             textAlign(CENTER);
 
-            text(data.txcount, this.x + this.d/2, this.y + this.d/2)
+            text(data.txcount.toLocaleString(), this.x + this.d/2, this.y + this.d/2)
         }
 
         // Time
