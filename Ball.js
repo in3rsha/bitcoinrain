@@ -31,7 +31,14 @@ function Ball(data) {
     // value
     this.value = data.value;
     this.btc = (data.value/100000000).toFixed(2); // 2 decimal places
-    this.currency = (data.value/100000000 * price_array[currency_select]).toFixed(2);
+    // this.currency = (data.value/100000000 * price_array[currency_select]).toFixed(2);
+
+    // create an array of the value of this transaction in each of the currencies
+    this.currency_values = [];
+    for (var i=0; i<price_array.length; i++) {
+      var result = (data.value/100000000 * price_array[i]).toFixed(2);
+      this.currency_values.push(result); // add to premade array of values in different currencies
+    }
 
     // size
     this.size = data.size;
@@ -100,7 +107,7 @@ function Ball(data) {
             fill(59); // grey for value
             textSize(this.label_size);
             textAlign(LEFT);
-            text(this.currency.replace(/\d(?=(\d{3})+\.)/g, '$&,') + " " + currency_array[currency_select], this.x+(this.d/2)+6, this.y+4);
+            text(this.currency_values[currency_select].replace(/\d(?=(\d{3})+\.)/g, '$&,') + " " + currency_array[currency_select], this.x+(this.d/2)+6, this.y+4);
           }
 
         }
@@ -121,7 +128,7 @@ function Ball(data) {
     this.update = function() {
 
         // currency - keep updating incase selected currency changes
-        this.currency = (data.value/100000000 * price_array[currency_select]).toFixed(2);
+        // this.currency = (data.value/100000000 * price_array[currency_select]).toFixed(2);
 
         // If a switch between bytes to value is made, update the ball dimensions
         if (this.switch_dimension === true) { // switch turned on by changing from size to value (preventing us from constantly having to set the size of the ball)
