@@ -116,8 +116,8 @@ function Ball(data) {
         if (data.donation == true) {
             fill(100);
             textSize(13);
-            textAlign(LEFT);
-            text("Thanks!", this.x + this.d + 2, this.y + 4);
+            textAlign(CENTER);
+            text("Thanks!", this.x, this.y - 12);
         }
 
 

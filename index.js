@@ -366,7 +366,7 @@ function draw() {
     if (donations_incoming > 0) {
       textAlign(CENTER);
       textSize(16);
-      fill(255, 215, 0); // gold color
+      fill(51, 100, 100); // gold color
       text("Donation Incoming!", windowWidth/2, 12);
     }
 
