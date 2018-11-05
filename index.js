@@ -372,9 +372,19 @@ function draw() {
           // mempool.size  = blocks[i].mempool_size;
 
           // Adjust the mempool with the change stored in the block
+          // calculate the difference to reduce my mempool down by (to bring it in line with actual count) when block passes mempool
+
+          // Calculate how much to adjust the mempool by as soon as block passes current mempool size
           // Don't want to change to absolute mempool value, as block may arrive later in sketch when window is refocused
-          mempool.count += blocks[i].mempool_count_change; // update mempool with information contained in the block
-          mempool.size  += blocks[i].mempool_size_change;
+          let mempool_count_change = blocks[i].mempool_count - mempool.count; // use the mempool count from when the block was mined
+          let mempool_size_change = blocks[i].mempool_size - mempool.size;
+
+          console.log("Mempool Count Change: " + mempool_count_change);
+          console.log("Mempool Size Change: " + mempool_count_change);
+
+          // Update mempool to its actual current value using the difference found from the mempool size when the block was mined
+          mempool.count += mempool_count_change; // update mempool using information contained in the block
+          mempool.size  += mempool_size_change;
 
           // Mark it as counted so it isn't constantly increasing counts
           blocks[i].mempool_updated = true;

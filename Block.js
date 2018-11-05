@@ -12,12 +12,8 @@ function Block(data) {
     // store the time this block object was initialized (for debugging - make sure it is created as soon as websocket message received)
     this.time_initialized = hour() + ":" + minute() + ":" + second();
     console.log("Block Object Created: " + this.time_initialized);
-
-    // store the difference to reduce my mempool down by (to bring it in line with actual count) when block passes mempool
-    this.mempool_count_change = data.mempool.count - mempool.count;
-    this.mempool_size_change = data.mempool.size - mempool.size;
-    console.log("Mempool Count Change: " + this.mempool_count_change);
-    console.log("Mempool Size Change: " + this.mempool_count_change);
+    console.log("New Mempool Count: " + data.mempool.count);
+    console.log("New Mempool Size: " + data.mempool.size);
 
 		// diameter
     this.d = map(data.size, 0, 1600000, 20, 180, true) // 1.6MB is max size
