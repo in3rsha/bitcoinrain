@@ -154,24 +154,22 @@ function setup() {
         }
 
         if (json.type == 'block') {
+
           if (focused) {
             let block = new Block(json, true);
         	  blocks_waiting.push(block);
           }
-          else {
+
+          if (!focused) {
             let block = new Block(json, false); // let block know that we were not focused when it was created
             blocks.push(block); // still want blocks to be added to array for displaying purposes
 
-            // Update mempool if we're away from the screen
+            // Update mempool seeing as we are away from the screen
             block_count += 1; // count block as mined
             mempool.count = block.mempool_count; // update mempool with information contained in the block
             mempool.size  = block.mempool_size;
           }
 
-          // Add to meters while away
-          // if (!focused) {
-          //	block_count += 1; // tx/s
-          // }
         }
 
         if (json.type == 'mempool') { // mempool message gets sent early so you get a starting state for the mempool
@@ -376,26 +374,12 @@ function draw() {
 
         // Update mempool if it has not already been updated
         if (blocks[i].mempool_updated == false) {
+
           // Blocks come with new information about the size of the mempool, so update mempool as block passes across it
           mempool.count = blocks[i].mempool_count; // update mempool with information contained in the block
           mempool.size  = blocks[i].mempool_size;
 
-          // Adjust the mempool with the change stored in the block
-          // calculate the difference to reduce my mempool down by (to bring it in line with actual count) when block passes mempool
-
-          // Calculate how much to adjust the mempool by as soon as block passes current mempool size
-          // Don't want to change to absolute mempool value, as block may arrive later in sketch when window is refocused
-          // let mempool_count_change = blocks[i].mempool_count - mempool.count; // use the mempool count from when the block was mined
-          // let mempool_size_change = blocks[i].mempool_size - mempool.size;
-          //
-          // console.log("Mempool Count Change: " + mempool_count_change);
-          // console.log("Mempool Size Change: " + mempool_count_change);
-
-          // Update mempool to its actual current value using the difference found from the mempool size when the block was mined
-          // mempool.count += mempool_count_change; // update mempool using information contained in the block
-          // mempool.size  += mempool_size_change;
-
-          // Mark it as counted so it isn't constantly increasing counts
+          // Mark as updated so it only updates the mempool once
           blocks[i].mempool_updated = true;
         }
       }
@@ -404,6 +388,8 @@ function draw() {
       if (blocks[i].y > blockchain.y) {
           if (blocks[i].counted == false) {
             block_count += 1; // count block as mined
+
+            // Mark it as counted so it isn't constantly increasing counts
             blocks[i].counted = true;
           }
       }
