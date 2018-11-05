@@ -2,7 +2,7 @@
 var websocket_uri = "ws://127.0.0.1:8080"; // Connect to the websocket that proviedes a stream of tx, block, and mempool data
 var debug = false; // set this to true to show debug stats on the screen
 
-// Actual Mempool Debugging
+// Actual Mempool Size (for comparison and debugging)
 var mempool_messages = 0;
 var actual_mempool = {};
 
@@ -156,7 +156,7 @@ function setup() {
         if (json.type == 'block') {
 
           if (focused) {
-            let block = new Block(json, true);
+            let block = new Block(json, true); // block was in focus, so it will update mempool as it passes through it
         	  blocks_waiting.push(block);
           }
 
@@ -164,28 +164,37 @@ function setup() {
             let block = new Block(json, false); // let block know that we were not focused when it was created
             blocks.push(block); // still want blocks to be added to array for displaying purposes
 
+            // Get count and size of all live balls that are yet to enter and update the mempool
+            let balls_active_count = balls.length + balls_waiting.length;
+            let balls_active_size = 0;
+            for (let ball of balls) {
+              balls_active_size += ball.size;
+            }
+            for (let ball_waiting of balls_waiting) {
+              balls_active_size += ball_waiting.size;
+            }
+
             // Update mempool seeing as we are away from the screen
             block_count += 1; // count block as mined
-            mempool.count = block.mempool_count; // update mempool with information contained in the block
-            mempool.size  = block.mempool_size;
+            mempool.count = block.mempool_count - balls_active_count; // update mempool with information contained in the block
+            mempool.size  = block.mempool_size - balls_active_size;
           }
 
         }
 
         if (json.type == 'mempool') { // mempool message gets sent early so you get a starting state for the mempool
+
           // Only use first mempool message to set initial state
           if (mempool_messages < 1) {
         	   mempool.count = json.count; // set initial mempool count
              mempool.size  = json.size;  // set initial mempool size
 
-             mempool_messages += 1;
+             mempool_messages += 1; // counter
            }
 
            // Use all messages to store actual mempool for comparison and debugging
            actual_mempool = json;
-           // console.log(actual_mempool);
 
-           // console.log(hour() + ":" + minute() + ":" + second());
         }
 
         if (json.type == 'prices') {
@@ -369,17 +378,30 @@ function draw() {
         blocks[i].update(false); // let box fall
       }
 
-      // Block passes top of mempool box
+      // Block Passes Top of Mempool Box
       if (blocks[i].y > mempool.y) {
 
         // Update mempool if it has not already been updated
         if (blocks[i].mempool_updated == false) {
 
           // Blocks come with new information about the size of the mempool, so update mempool as block passes across it
-          mempool.count = blocks[i].mempool_count; // update mempool with information contained in the block
-          mempool.size  = blocks[i].mempool_size;
+          // Need to subtract balls that are yet to visually enter the mempool also
 
-          // Mark as updated so it only updates the mempool once
+          // Get count and size of all live balls that are yet to enter and update the mempool
+          let balls_active_count = balls.length + balls_waiting.length;
+          let balls_active_size = 0;
+          for (let ball of balls) {
+            balls_active_size += ball.size;
+          }
+          for (let ball_waiting of balls_waiting) {
+            balls_active_size += ball_waiting.size;
+          }
+
+          // Update mempool using information contained in the block
+          mempool.count = blocks[i].mempool_count - balls_active_count; // subtract active balls that are yet to update the mempool
+          mempool.size  = blocks[i].mempool_size - balls_active_size; // size will increase to current value after live balls have updated it
+
+          // Mark block as updated so it only updates the mempool once
           blocks[i].mempool_updated = true;
         }
       }
@@ -396,7 +418,9 @@ function draw() {
 
       // Block Passes Bottom of Blockchain Box
       if (blocks[i].y > blockchain.y + blockchain.height) {
-          blocks.splice(i, 1); // remove block from array
+
+          // remove block from array
+          blocks.splice(i, 1);
       }
 
     }

@@ -11,9 +11,9 @@ function Block(data, isfocused) {
 
     // store the time this block object was initialized (for debugging - make sure it is created as soon as websocket message received)
     this.time_initialized = hour() + ":" + minute() + ":" + second();
-    console.log("Block Object Created: " + this.time_initialized);
-    console.log("New Mempool Count: " + data.mempool.count);
-    console.log("New Mempool Size: " + data.mempool.size);
+    // console.log("Block Object Created: " + this.time_initialized);
+    // console.log("New Mempool Count: " + data.mempool.count);
+    // console.log("New Mempool Size: " + data.mempool.size);
 
 		// diameter
     this.d = map(data.size, 0, 1600000, 20, 180, true) // 1.6MB is max size
@@ -24,8 +24,9 @@ function Block(data, isfocused) {
     this.y = 0; // start the block at the top of the window
 
     if (isfocused == false) {
+      // make block appear in blockchain box without updating any counters (because it was done while sketch was not focused)
       this.y = blockchain.y + blockchain.height - this.d - this.strokewidth/2; // start block in its holding position
-      this.counted = true;
+      this.counted = true; // do not add to blocks mined counter, because it was incremented when we were not focused
       this.mempool_updated = true; // do not update the mempool, because it was changed when we were not focused
     }
 
