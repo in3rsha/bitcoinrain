@@ -155,11 +155,14 @@ function setup() {
 
         if (json.type == 'block') {
 
+          // Allow block to update mempool as it passes over it
           if (focused) {
             let block = new Block(json, true); // block was in focus, so it will update mempool as it passes through it
         	  blocks_waiting.push(block);
+            console.log("Block Added Focused");
           }
 
+          // Immediately update mempool and start block in bottom position
           if (!focused) {
             let block = new Block(json, false); // let block know that we were not focused when it was created
             blocks.push(block); // still want blocks to be added to array for displaying purposes
@@ -178,6 +181,8 @@ function setup() {
             block_count += 1; // count block as mined
             mempool.count = block.mempool_count - balls_active_count; // update mempool with information contained in the block
             mempool.size  = block.mempool_size - balls_active_size;
+
+            console.log("Block Added Not Focused");
           }
 
         }
