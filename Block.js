@@ -1,5 +1,5 @@
 // Block Object
-function Block(data) {
+function Block(data, isfocused) {
 
     // counting
     this.counted = false; // do not add me to any counters if I have already been counted
@@ -21,7 +21,13 @@ function Block(data) {
 
     // position
     this.x = width/2 - this.d/2; // center the block
-    this.y = 0;
+    this.y = 0; // start the block at the top of the window
+
+    if (isfocused == false) {
+      this.y = blockchain.y + blockchain.height - this.d - this.strokewidth/2; // start block in its holding position
+      this.counted = true;
+      this.mempool_updated = true; // do not update the mempool, because it was changed when we were not focused
+    }
 
     // drop
     this.velocity = 0;
