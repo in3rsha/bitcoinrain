@@ -71,6 +71,19 @@ loop do
     puts " getdata->"
     getdata = Bitcoin::Protocol::Message.new('getdata', message.payload)
     socket.write getdata.binary
+
+    # Get Mempool for Debugging Purposes
+    mempoolinfo = getmempoolinfo() # returns json (using function from getmempoolcount.rb)
+    puts mempoolinfo
+
+    # Write message to every connected client
+    clients.each do |client|
+      begin
+        client.puts mempoolinfo  # Send an updated mempool count message too
+      rescue
+        clients.delete(client) # remove client from list because it has disconnected
+      end
+    end
   end
 
   # 6. Receive txs (in response to our getdata)

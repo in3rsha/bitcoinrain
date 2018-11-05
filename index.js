@@ -1,6 +1,10 @@
 // config
-var websocket_uri = "ws://bitcoinrain.io:8080"; // Connect to the websocket that proviedes a stream of tx, block, and mempool data
+var websocket_uri = "ws://127.0.0.1:8080"; // Connect to the websocket that proviedes a stream of tx, block, and mempool data
 var debug = false; // set this to true to show debug stats on the screen
+
+// Actual Mempool Debugging
+var mempool_messages = 0;
+var actual_mempool = {};
 
 // Connection
 var problem = false;
@@ -162,8 +166,15 @@ function setup() {
         }
 
         if (json.type == 'mempool') { // mempool message gets sent early so you get a starting state for the mempool
-        	mempool.count = json.count; // set initial mempool count
-          mempool.size  = json.size;  // set initial mempool size
+          // Only use first mempool message to set initial state
+          if (mempool_messages < 1) {
+        	   mempool.count = json.count; // set initial mempool count
+             mempool.size  = json.size;  // set initial mempool size
+           }
+
+           // Use all messages to store actual mempool for comparison and debugging
+           actual_mempool = json;
+           console.log(actual_mempool);
         }
 
         if (json.type == 'prices') {
@@ -456,6 +467,9 @@ function draw() {
       text("Interval:       " + interval_tx, 24, 88);
       text("Next Tx:        " + next_tx, 24, 112);
       text("Total Txs:      " + tx_count, 24, 136);
+
+      text("Actual Mempool Count: " + actual_mempool.count, 24, 180);
+      text("Actual Mempool Size:  " + actual_mempool.size, 24, 204);
 
       // text("Blocks Waiting: " + blocks_waiting.length, 24, 180);
       // text("Blocks Active:  " + blocks.length, 24, 204);
