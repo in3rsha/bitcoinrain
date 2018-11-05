@@ -170,11 +170,15 @@ function setup() {
           if (mempool_messages < 1) {
         	   mempool.count = json.count; // set initial mempool count
              mempool.size  = json.size;  // set initial mempool size
+
+             mempool_messages += 1;
            }
 
            // Use all messages to store actual mempool for comparison and debugging
            actual_mempool = json;
-           console.log(actual_mempool);
+           // console.log(actual_mempool);
+
+           // console.log(hour() + ":" + minute() + ":" + second());
         }
 
         if (json.type == 'prices') {
@@ -364,8 +368,13 @@ function draw() {
         // Update mempool if it has not already been updated
         if (blocks[i].mempool_updated == false) {
           // Blocks come with new information about the size of the mempool, so update mempool as block passes across it
-          mempool.count = blocks[i].mempool_count; // update mempool with information contained in the block
-          mempool.size  = blocks[i].mempool_size;
+          // mempool.count = blocks[i].mempool_count; // update mempool with information contained in the block
+          // mempool.size  = blocks[i].mempool_size;
+
+          // Adjust the mempool with the change stored in the block
+          // Don't want to change to absolute mempool value, as block may arrive later in sketch when window is refocused
+          mempool.count += blocks[i].mempool_count_change; // update mempool with information contained in the block
+          mempool.size  += blocks[i].mempool_size_change;
 
           // Mark it as counted so it isn't constantly increasing counts
           blocks[i].mempool_updated = true;
@@ -485,10 +494,10 @@ function draw() {
 
       textAlign(RIGHT);
       text("Millisconds:    " + millis(), windowWidth-24, 40);   // p5js time since program started
-      text("Frame Count:    " + frameCount, windowWidth-24, 80); // p5js frames since program started
-      if (frameRate() < 50) { fill(255, 0, 0); } // show frame count in red if it drops a lot
-      text("Frame Rate:     " + frameRate().toFixed(0), windowWidth-24, 104);
-      fill(200);
+      // text("Frame Count:    " + frameCount, windowWidth-24, 80); // p5js frames since program started
+      // if (frameRate() < 50) { fill(255, 0, 0); } // show frame count in red if it drops a lot
+      // text("Frame Rate:     " + frameRate().toFixed(0), windowWidth-24, 104);
+      // fill(200);
     }
 }
 
