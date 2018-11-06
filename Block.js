@@ -1,6 +1,9 @@
 // Block Object
 function Block(data, isfocused) {
 
+    // hidden
+    this.hidden = false; // stop displaying blocks after they have dropped well below the blockchain box
+
     // counting
     this.counted = false; // do not add me to any counters if I have already been counted
 
@@ -27,8 +30,8 @@ function Block(data, isfocused) {
     this.y = 0; // start the block at the top of the window
 
     if (isfocused == false) {
-      // make block appear in blockchain box without updating any counters (because it was done while sketch was not focused)
-      this.y = blockchain.y + blockchain.height - this.d - this.strokewidth/2; // start block in its holding position
+      // start block below blockchain box without updating any counters (because it was done while sketch was not focused)
+      this.y = blockchain.y + blockchain.height; // - this.d - this.strokewidth/2; // start block in its holding position
       this.counted = true; // do not add to blocks mined counter, because it was incremented when we were not focused
       this.mempool_updated = true; // do not update the mempool, because it was changed when we were not focused
     }
@@ -41,9 +44,9 @@ function Block(data, isfocused) {
     this.sticky = false;
 
 		// bounce
-    this.elasticity = 0.6 + randomGaussian(0.0, 0.05); // add some noise
-    this.bounce = 0; // bounce count
-    this.chained = false; // switch to indicate if a block has hit the stack yet
+    // this.elasticity = 0.6 + randomGaussian(0.0, 0.05); // add some noise
+    // this.bounce = 0; // bounce count
+    // this.chained = false; // switch to indicate if a block has hit the stack yet
 
     // color
     //this.r = 100;

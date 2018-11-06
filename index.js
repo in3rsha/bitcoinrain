@@ -375,62 +375,78 @@ function draw() {
 
     // Show Blocks
     for (i=0; i<blocks.length; i++) { // Constantly .show each block in array
+
+      // do not show any blocks that have been marked as hidden
+      if (blocks[i].hidden == false) {
+
         blocks[i].show();
+
+      }
+
     }
 
     for (i=0; i<blocks.length; i++) { // Constantly .update each block in array
-      // drop
-      if (i == blocks.length - 1) { // if this is the most recently added block to the array (last one in array)
-        blocks[i].update(true); // hold the block at the base of the blockchain box
-      }
-      else {
-        blocks[i].update(false); // let box fall
-      }
 
-      // Block Passes Top of Mempool Box
-      if (blocks[i].y > mempool.y) {
+      // do not update any blocks that have been marked as hidden (ones that have dropped well below bottom of blockchain box)
+      if (blocks[i].hidden == false) {
 
-        // Update mempool if it has not already been updated
-        if (blocks[i].mempool_updated == false) {
-
-          // Blocks come with new information about the size of the mempool, so update mempool as block passes across it
-          // Need to subtract balls that are yet to visually enter the mempool also
-
-          // Get count and size of all live balls that are yet to enter and update the mempool
-          let balls_active_count = balls.length + balls_waiting.length;
-          let balls_active_size = 0;
-          for (let ball of balls) {
-            balls_active_size += ball.size;
-          }
-          for (let ball_waiting of balls_waiting) {
-            balls_active_size += ball_waiting.size;
-          }
-
-          // Update mempool using information contained in the block
-          mempool.count = blocks[i].mempool_count - balls_active_count; // subtract active balls that are yet to update the mempool
-          mempool.size  = blocks[i].mempool_size - balls_active_size; // size will increase to current value after live balls have updated it
-
-          // Mark block as updated so it only updates the mempool once
-          blocks[i].mempool_updated = true;
+        // drop
+        if (i == blocks.length - 1) { // if this is the most recently added block to the array (last one in array)
+          blocks[i].update(true); // hold the block at the base of the blockchain box
         }
-      }
+        else {
+          blocks[i].update(false); // let box fall
+        }
 
-      // Block Passes Top of Blockchain Box
-      if (blocks[i].y > blockchain.y) {
-          if (blocks[i].counted == false) {
-            block_count += 1; // count block as mined
+        // Block Passes Top of Mempool Box
+        if (blocks[i].y > mempool.y) {
 
-            // Mark it as counted so it isn't constantly increasing counts
-            blocks[i].counted = true;
+          // Update mempool if it has not already been updated
+          if (blocks[i].mempool_updated == false) {
+
+            // Blocks come with new information about the size of the mempool, so update mempool as block passes across it
+            // Need to subtract balls that are yet to visually enter the mempool also
+
+            // Get count and size of all live balls that are yet to enter and update the mempool
+            let balls_active_count = balls.length + balls_waiting.length;
+            let balls_active_size = 0;
+            for (let ball of balls) {
+              balls_active_size += ball.size;
+            }
+            for (let ball_waiting of balls_waiting) {
+              balls_active_size += ball_waiting.size;
+            }
+
+            // Update mempool using information contained in the block
+            mempool.count = blocks[i].mempool_count - balls_active_count; // subtract active balls that are yet to update the mempool
+            mempool.size  = blocks[i].mempool_size - balls_active_size; // size will increase to current value after live balls have updated it
+
+            // Mark block as updated so it only updates the mempool once
+            blocks[i].mempool_updated = true;
           }
-      }
+        }
 
-      // Block Passes Bottom of Blockchain Box
-      if (blocks[i].y > blockchain.y + blockchain.height) {
+        // Block Passes Top of Blockchain Box
+        if (blocks[i].y > blockchain.y) {
+            if (blocks[i].counted == false) {
+              block_count += 1; // count block as mined
 
-          // remove block from array
-          blocks.splice(i, 1);
-      }
+              // Mark it as counted so it isn't constantly increasing counts
+              blocks[i].counted = true;
+            }
+          }
+
+          // Block Passes Well Below Bottom of Blockchain Box
+          if (blocks[i].y > blockchain.y + blockchain.height + blocks[i].d) {
+            
+            // stop showing and updating block
+            blocks[i].hidden = true;
+
+            // remove block from array
+            //blocks.splice(i, 1);
+          }
+
+        } // hidden == false
 
     }
 

@@ -7,8 +7,8 @@ function Ball(data) {
     this.y = 0;
 
     // set x position using the randomness of the txid
-    txid_slice = data.txid.slice(-8); // get last 8 characters of txid
-    txid_decimal = parseInt(txid_slice, 16); // convert hex to decimal
+    let txid_slice = data.txid.slice(-8); // get last 8 characters of txid
+    let txid_decimal = parseInt(txid_slice, 16); // convert hex to decimal
     this.x = txid_decimal % windowWidth; // randomly position modulo the width of the window
 
     // dimensions
