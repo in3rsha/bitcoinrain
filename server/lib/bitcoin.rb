@@ -50,12 +50,12 @@ module Bitcoin
         # Keep reading until you get 4 bytes of magic
         buffer = ""
         loop do
-          byte = self.recv(1)
+          byte = self.read(1) # recv(1) - [ ] not sure which is best to use
           byte = byte.unpack("H*").join
 
-          # STDOUT.print byte
+          #STDOUT.print byte
           # STDOUT.print "."
-          sleep(0.0001)
+          sleep(0.001)
 
           buffer += byte
           if buffer.size == 8
