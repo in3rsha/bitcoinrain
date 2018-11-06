@@ -1,5 +1,5 @@
 // config
-var websocket_uri = "ws://127.0.0.1:8080"; // Connect to the websocket that proviedes a stream of tx, block, and mempool data
+var websocket_uri = "ws://bitcoinrain.io:8080"; // Connect to the websocket that proviedes a stream of tx, block, and mempool data
 var debug = false; // set this to true to show debug stats on the screen
 
 // Actual Mempool Size (for comparison and debugging)
