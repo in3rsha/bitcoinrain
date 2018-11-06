@@ -9,6 +9,9 @@ function Block(data, isfocused) {
     this.mempool_count = data.mempool.count
     this.mempool_size = data.mempool.size
 
+    // block data
+    this.count = data.txcount;
+
     // store the time this block object was initialized (for debugging - make sure it is created as soon as websocket message received)
     this.time_initialized = hour() + ":" + minute() + ":" + second();
     // console.log("Block Object Created: " + this.time_initialized);
@@ -78,12 +81,15 @@ function Block(data, isfocused) {
 
         // Time
         if (data.size > 10) {
-            fill(22);
+            // map color from green to red based on time since block was mined (red = 20 mins = block more imminent)
+            let time_since = unixtime - data.timestamp;
+            let hue = map(time_since, 0, 1200, 125, 359, true); // 0 to 20 mins (1200 seconds) (green to red)
+            fill(hue, 100, 38);
             textSize(18);
             noStroke();
             textAlign(LEFT);
 
-            text((fancyTimeFormat(unixtime - data.timestamp) + " ago"), this.x + this.d + this.strokewidth*3, this.y + this.d/2)
+            text((fancyTimeFormat(time_since) + " ago"), this.x + this.d + this.strokewidth*3, this.y + this.d/2)
         }
     }
 

@@ -155,11 +155,14 @@ function setup() {
 
         if (json.type == 'block') {
 
+          console.log("Block Message...");
+
           // Allow block to update mempool as it passes over it
           if (focused) {
             let block = new Block(json, true); // block was in focus, so it will update mempool as it passes through it
         	  blocks_waiting.push(block);
-            console.log("Block Added Focused");
+            console.log("Block Added Focused: " + block.count);
+            console.log("Mempool Count: " + block.mempool_count);
           }
 
           // Immediately update mempool and start block in bottom position
@@ -182,7 +185,8 @@ function setup() {
             mempool.count = block.mempool_count - balls_active_count; // update mempool with information contained in the block
             mempool.size  = block.mempool_size - balls_active_size;
 
-            console.log("Block Added Not Focused");
+            console.log("Block Added Not Focused: " + block.count);
+            console.log("Mempool Count: " + block.mempool_count);
           }
 
         }
