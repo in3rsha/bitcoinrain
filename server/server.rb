@@ -74,7 +74,7 @@ loop do
 
     # Get Mempool for Debugging Purposes
     mempoolinfo = getmempoolinfo() # returns json (using function from getmempoolcount.rb)
-    puts mempoolinfo
+    # puts mempoolinfo
 
     # Write message to every connected client
     clients.each do |client|

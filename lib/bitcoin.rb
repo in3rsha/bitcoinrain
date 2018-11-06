@@ -52,7 +52,11 @@ module Bitcoin
         loop do
           byte = self.recv(1)
           byte = byte.unpack("H*").join
+
           # STDOUT.print byte
+          # STDOUT.print "."
+          # sleep(0.0001)
+
           buffer += byte
           if buffer.size == 8
             if buffer == "f9beb4d9"
@@ -176,14 +180,14 @@ module Bitcoin
         return [hex].pack("H*")
       end
 
-      def self.version(version=70015, services=13, lastblock=0)
+      def self.version(version=70014, services=13, lastblock=0)
         # https://github.com/bitcoin/bitcoin/blob/master/src/version.h
         # 60002 = 62EA0000
         # 70011 = 7b110100
         # 70012 = 7c110100
         # 70013 = 7d110100 <- ! socket.recv(0) on a verack payload blocks on this version
         # 70014 = 7e110100 <-   this is what PHP script uses
-        # 70015 = 7f110100 <-   this is the version of the remote node
+        # 70015 = 7f110100 <-   this is the version of the remote node - ! hangs after getheaders, may need to send a sendcmpt message (bip 0152)
 
         payload =  Utils.reversebytes(Utils.field(version.to_s(16))) #  protocol version
         payload += "0D 00 00 00 00 00 00 00" # services (NODE_NETWORK = 1) (Segwit: NODE_WITNESS = (puts 1 << 3))
