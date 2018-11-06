@@ -6,6 +6,9 @@ var debug = false; // set this to true to show debug stats on the screen
 var mempool_messages = 0;
 var actual_mempool = {};
 
+// Clicks
+var clicks = 0;
+
 // Connection
 var problem = false;
 var problem_message;
@@ -27,17 +30,6 @@ var block_count = 0;
 var bounce_record = 0;
 var records_set = 0; // keep track of how many times a new record has been set
 var bounces_above = 0; // keep track of how many balls make it above the top of the screen
-
-// Donation Box
-var donate; // donate box dom element handle
-var donate_show = false;
-var donations_threshold = Math.floor(Math.random() * (10 - 5)) + 5; // random number between 5 and 10?
-var clicks = 0; // click counter
-var donate_opacity = 1;
-var donate_opacity_reduce = 0.05
-var donations_incoming = 0;
-var donate_x;
-var donate_y;
 
 // Regulation
 var balls_waiting = []; // this is global in scope (i.e. for the draw() loop)
@@ -90,14 +82,8 @@ function setup() {
     // Create Blockchain area
     blockchain = new Blockchain();
 
-    // Donation Box
-    donate = select("#donate");
-    donate.style("width", "400px");
-    donate.style("font-family", myFont);
-    donate.style("color", "#999"); // ccc = 80 brightness, bbb=73, aaa=67, 999=60
-    donate_x = windowWidth/2 - 200;
-    donate_y = windowHeight/2 - 100;
-    donate.position(donate_x, donate_y);
+    // Create Donations box
+    donations = new Donations();
 
     // Attach callback function to websocket event in the setup...
     var ws = new WebSocket(websocket_uri);
@@ -120,7 +106,7 @@ function setup() {
 				if (json.type == 'tx') {
           // Donation Incoming!
           if (json.donation) {
-            donations_incoming++; // add to number of donations incoming
+            donations.incoming++; // add to number of donations incoming
           }
 
 					// Only add balls to array if the window is focused (prevent a torrent of backed up balls)
@@ -292,12 +278,12 @@ function draw() {
     if (millis() > next_tx) { // millis() = time since program started
         // Add a ball to live balls only if we have one
         if (balls_waiting.length > 0) {
-            a = balls_waiting.shift(); // get the first one
+            let a = balls_waiting.shift(); // get the first one
             balls.push(a); // add it to end of live balls
 
             // Remove donation incoming message if we have just made a donation ball go live
             if (a.donation) {
-              donations_incoming--; // subtract from incoming donations count
+              donations.incoming--; // subtract from incoming donations count
             }
 
             // tx/s
@@ -357,6 +343,10 @@ function draw() {
     // Blockchain
     blockchain.show();
     blockchain.update(); // update the width when canvas expands
+
+    // Donations
+    donations.show();
+    donations.update();
 
     // Update Time
     unixtime = Math.floor(Date.now() / 1000);
@@ -438,7 +428,7 @@ function draw() {
 
           // Block Passes Well Below Bottom of Blockchain Box
           if (blocks[i].y > blockchain.y + blockchain.height + blocks[i].d) {
-            
+
             // stop showing and updating block
             blocks[i].hidden = true;
 
@@ -450,41 +440,6 @@ function draw() {
 
     }
 
-    // Donations Incoming
-    if (donations_incoming > 0) {
-      textAlign(CENTER);
-      textSize(16);
-      fill(51, 100, 100); // gold color
-      text("Donation Incoming!", windowWidth/2, 12);
-    }
-
-    // Donation Box
-    donate_x = windowWidth/2 - 200;
-    donate_y = windowHeight/2 - 100;
-    donate.position(donate_x, donate_y);
-
-    // Display Donation Box after a number of balls above screen (and there is no problem with the connection)
-    if (bounces_above >= donations_threshold && !problem) {
-
-      //donate.style("display", "block");
-      donate.show(); // use p5js show() instead of donate.style("display", "block");
-      donate_show = true;
-
-      // Hide donation box once it has fully faded out
-      if (donate_opacity <= 0) {
-        donate_show = false;
-        donate.hide();
-      }
-
-    }
-
-    if (donate_show) {
-      // Try Donating message
-      fill(0, 0, 60, donate_opacity); // 60=#999, 67=#aaa, 73=#bbb, 80=#ccc
-      textSize(15);
-      textAlign(CENTER);
-      text("Try Donating!", windowWidth/2, donate_y + 40);
-    }
 
     // Mempool Not Expanded
     if (mempool.expanded === false) {
@@ -544,7 +499,7 @@ function draw() {
 
       text("Bounces Above:  " + bounces_above, 24, 396);
       text("Records Set:    " + records_set, 24, 420);
-      text("Donate Bounces: " + donations_threshold, 24, 444);
+      text("Donate Bounces: " + donations.threshold, 24, 444);
 
       textAlign(RIGHT);
       text("Millisconds:    " + millis(), windowWidth-24, 40);   // p5js time since program started
@@ -618,9 +573,9 @@ function touchStarted() { // touch for mobiles (will use mousePressed instead if
     clicks++;
 
     // Donations Box - Reduce lightness so it fades out on each click
-    if (donate_show) {
-      donate_opacity -= donate_opacity_reduce;
-      donate.style("opacity", donate_opacity); // update font opacity
+    if (donations.active) {
+      donations.opacity -= donations.opacity_reduce;
+      donations.box.style("opacity", donations.opacity); // update font opacity
     }
 }
 
