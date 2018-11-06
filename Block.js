@@ -83,7 +83,7 @@ function Block(data, isfocused) {
         if (data.size > 10) {
             // map color from green to red based on time since block was mined (red = 20 mins = block more imminent)
             let time_since = unixtime - data.timestamp;
-            let hue = map(time_since, 0, 1200, 125, 359, true); // 0 to 20 mins (1200 seconds) (green to red)
+            let hue = map(time_since, 0, 1200, 120, 359, true); // 0 to 20 mins (1200 seconds) (green to red)
             fill(hue, 100, 38);
             textSize(18);
             noStroke();
