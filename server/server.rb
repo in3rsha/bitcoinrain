@@ -1,5 +1,5 @@
 require 'socket'
-require_relative '../lib/bitcoin.rb'
+require_relative 'lib/bitcoin.rb'
 require_relative 'requests/getmempoolinfo.rb' # Get an up to date mempool count after new block arrives
 
 # A. Create socket for clients to read from
@@ -20,8 +20,8 @@ Thread.new do # Thread for handling new connections
 end
 
 # B. Connect to the decoder programs (write to them and they will return a json result back)
-txdecoder = IO.popen("php ../decoders/txdecoder.php", "r+")
-blockdecoder = IO.popen("php ../decoders/blockdecoder.php", "r+")
+txdecoder = IO.popen("php decoders/txdecoder.php", "r+")
+blockdecoder = IO.popen("php decoders/blockdecoder.php", "r+")
 
 
 # 1. Connect to a bitcoin server
