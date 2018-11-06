@@ -55,7 +55,7 @@ module Bitcoin
 
           # STDOUT.print byte
           # STDOUT.print "."
-          # sleep(0.0001)
+          sleep(0.0001)
 
           buffer += byte
           if buffer.size == 8
