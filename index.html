@@ -83,7 +83,7 @@
   <li><strong style="color:#B700FF;">Purple Raindrop</strong> = <a href="http://learnmeabitcoin.com/faq/segregated-witness">Segwit</a> Transaction</li>
   </ul>
   <p>New transactions this node receives enter its <strong>memory pool</strong>. They are held in the node's memory for up to 72 hours.</p>
-  <p>The node also recevies <strong>blocks</strong> every 10 minutes on average. A <a href="http://learnmeabitcoin.com/guide/blocks">block</a> takes transactions from the <a href="http://learnmeabitcoin.com/glossary/memory-pool">memory pool</a> and adds them them to the <a href="http://learnmeabitcoin.com/guide/blockchain">blockchain</a>.</p>
+  <p>The node also recevies <strong>blocks</strong> (every 10 minutes on average). A <a href="http://learnmeabitcoin.com/guide/blocks">block</a> takes transactions from the <a href="http://learnmeabitcoin.com/glossary/memory-pool">memory pool</a> and adds them them to the <a href="http://learnmeabitcoin.com/guide/blockchain">blockchain</a>.</p>
   <h3>Keyboard</h3>
   <ul>
     <li><strong>Left/Right Arrow</strong> = Change Raindrop Size (between Bytes and Transaction Value)</li>
@@ -103,13 +103,15 @@
   <h3 id="whats-the-use">What's the use?</h3>
   <p>It's cool to watch bitcoin transactions as they're happening. You can see the current transaction rate, as well as how much money is being moved per second.</p>
   <p>Personally, I use it to watch and wait for the next block to get mined.</p>
+  <h3>Are these transactions really live?</h3>
+  <p>Yes. I do add a tiny delay between transactions to create a smoother rain effect, but aside from that this website is showing every new transaction on the bitcoin network as my node receives it.
   <h3 id="why-do-transactions-bounce-off-the-memory-pool">Why do transactions bounce off the memory pool?</h3>
   <p>Because I thought it would look cool, so it doesn't symbolise anything. However, I did make transactions <em>bouncier</em> if they're moving a high quantity of bitcoins in a small number of bytes of <a href="http://learnmeabitcoin.com/glossary/transaction-data">transaction data</a> (i.e. more "efficient").</p>
   <h3 id="wheres-the-code-for-this-website">Where's the code for this website?</h3>
   <p>I haven't released it yet, but I'll send you a link if you're interested.</p>
   <p>But to summarize:</p>
   <ul>
-  <li>I'm using <a href="https://www.ruby-lang.org/en/">Ruby</a> to connect to my node in Switzerland to receive all the transactions and blocks it is relaying.</li>
+  <li>I'm using <a href="https://www.ruby-lang.org/en/">Ruby</a> to connect to my node so I can receive all the transactions and blocks it is relaying.</li>
   <ul>
   <li>I also send the node <a href="https://en.bitcoin.it/wiki/API_reference_%28JSON-RPC%29">RPC requests</a> to get extra information from it.</li>
   </ul>
@@ -124,6 +126,7 @@
   <ul>
   <li>Thanks to <a href="https://www.youtube.com/user/shiffman">Daniel Shiffman</a> for the p5.js tutorials.</li>
   <li>I found this simple <a href="https://www.webpagefx.com/web-design/color-picker/">color picker</a> particularly handy.</li>
+  <li><a href="http://www.bitlisten.com/">BitListen.com</a> was an inspiration for working with live bitcoin data in the browser.</li>
   </ul>
 </div>
 
