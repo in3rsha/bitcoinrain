@@ -21,8 +21,31 @@
       }
 
       div#about {display: none; margin:8px;}
+      div#about h1 {margin-top:56px;}
       div#about h2 {margin-top:1.8em;}
       div#about h3 {margin-top:1.6em;}
+
+      button {}
+
+      button {
+        background-color: #222;
+        border: 1px solid #555;
+        color: #999;
+        padding: 4px 12px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        outline: 0px;
+      }
+
+      button:hover { background-color:#111; color:#aaa; outline: 0px; }
+      button:focus { outline: 0px; }
+      button:active { background-color: #222; color:#999; outline: 0px; }
+
+      button::-moz-focus-inner {
+        border: 0;
+      }
 
       div#donate {text-align:center; font-size:16px; font-family:'whitrabt', monospace; line-height:22px; width:400px; display:none;}
       div#donate::selection {color: gold; background-color:#555;}
@@ -47,21 +70,29 @@
         Rotate me! This website works best in landscape mode.
     </div>
 
+    <button id="button">about</button>
+
 <div id="about">
   <h1>BitcoinRain.io</h1>
-  <p>This website is a visualisation of the transactions and blocks being received by a bitcoin node.</p>
+  <p>This website is a live visualisation of the transactions and blocks received by a bitcoin node.</p>
   <!--
   <p>The <a href="http://learnmeabitcoin.com/guide/nodes">node</a> is connected to other nodes on the <a href="http://learnmeabitcoin.com/guide/network">bitcoin network</a> and is receiving transactions from them:</p>
   -->
   <ul>
   <li><strong style="color:#00729C;">Blue Raindrop</strong> = Transaction</li>
-  <li><strong style="color:#B700FF;">Purple Raindrop</strong> = Segwit Transaction</li>
+  <li><strong style="color:#B700FF;">Purple Raindrop</strong> = <a href="http://learnmeabitcoin.com/faq/segregated-witness">Segwit</a> Transaction</li>
   </ul>
-  <p>New transactions this node receives enter the <strong>memory pool</strong>. Here they are held in the node's memory for up to 72 hours.</p>
+  <p>New transactions this node receives enter its <strong>memory pool</strong>. They are held in the node's memory for up to 72 hours.</p>
   <p>The node also recevies <strong>blocks</strong> every 10 minutes on average. A <a href="http://learnmeabitcoin.com/guide/blocks">block</a> takes transactions from the <a href="http://learnmeabitcoin.com/glossary/memory-pool">memory pool</a> and adds them them to the <a href="http://learnmeabitcoin.com/guide/blockchain">blockchain</a>.</p>
+  <h3>Keyboard</h3>
+  <ul>
+    <li><strong>Left/Right Arrow</strong> = Change Raindrop Size (between Bytes and Transaction Value)</li>
+    <li><strong>Up/Down Arrow</strong> = Change Currency</li>
+    <li><strong>Enter</strong> = Show/Hide Labels <em>(visualisation is a bit faster without labels)</em></li>
+  </ul>
   <h2 id="about-me">About Me</h2>
   <p>This is my first attempt at real-time visualisation. I'm also currently working on <a href="http://learnmeabitcoin.com">learnmeabitcoin.com</a>, which is a website with <em>simple documentation</em> for bitcoin. It also has a rudimentary <a href="http://learnmeabitcoin.com/browser/">blockchain explorer</a>.</p>
-  <p>There are two things I like:</p>
+  <p>Two things I like:</p>
   <ul>
   <li>Comments for improvements: <code style="font-size:16px; font-weight:bold; color:darkblue;">greg[at]learnmeabitcoin[dot]com</code> or <a href="https://twitter.com/in3rsha">Twitter</a></li>
   <li>Donations for beer: <code style="font-size:16px; font-weight:bold; color:darkgreen;">1RainRzqJtJxHTngafpCejDLfYq2y4KBc</code> (donations are highlighted in the visualisation)</li>
@@ -85,6 +116,10 @@
   <li>I'm using <a href="https://github.com/joewalnes/websocketd">websocketd</a> turn this stream of data in to a WebSocket server.</li>
   <li>I use Javascript in the browser to read from the websocket, and <a href="https://p5js.org/">p5.js</a> to create the visualisation.</li>
   </ul>
+  <h3>And where's that live websocket feed?</h3>
+    <p>Here: <a href="http://bitcoinrain.io:8080">http://bitcoinrain.io:8080</a></p>
+    <p>Don't use it for anything serious though as I'm likely to change it.</p>
+
   <h2 id="credits">Credits</h2>
   <ul>
   <li>Thanks to <a href="https://www.youtube.com/user/shiffman">Daniel Shiffman</a> for the p5.js tutorials.</li>

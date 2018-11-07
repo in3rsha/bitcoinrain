@@ -1,6 +1,7 @@
 var myCanvas;
 var about;
 var about_active = false;
+var about_button;
 
 // config
 var websocket_uri = "ws://bitcoinrain.io:8080"; // Connect to the websocket that proviedes a stream of tx, block, and mempool data
@@ -68,6 +69,18 @@ function preload() { // preload stuff (before setup() and all other p5 stuff)
     myFont = loadFont('assets/whitrabt.ttf');
 }
 
+function aboutSwitch() {
+  if (about_active == false) {
+    myCanvas.hide();
+    about.show();
+    about_active = true;
+  } else {
+    myCanvas.show();
+    about.hide();
+    about_active = false;
+  }
+}
+
 function setup() {
 
     // Color
@@ -79,6 +92,9 @@ function setup() {
 
     // About
     about = select("#about");
+    about_button = select("#button");
+    about_button.position(8, 8);
+    about_button.mousePressed(aboutSwitch);
 
     // Font
     textFont(myFont);
