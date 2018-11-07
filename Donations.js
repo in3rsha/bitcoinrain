@@ -23,7 +23,7 @@ function Donations() {
 
   this.show = function() {
 
-    if (this.active) {
+    if (this.active && about_active == false) {
       // Donations Address HTML Text
       this.box.show(); // use p5js show() instead of donate.style("display", "block");
 

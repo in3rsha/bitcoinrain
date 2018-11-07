@@ -9,16 +9,18 @@
       src: url('assets/whitrabt.ttf') format('truetype');
     }
 
-      body {margin:0; font-family: Sans;}
+      body {margin:0; font-family: Sans; background-color:#ddd; line-height:1.5em;}
 
-      #warning-message {display: none; margin:8px; font-size:36px;}
+      div#warning-message {display: none; margin:8px; font-size:36px;}
       @media only screen and (orientation:portrait){
-          #sketch { display:none; }
-          #warning-message { display:block; }
+          div#sketch { display:none; }
+          div#warning-message { display:block; }
       }
       @media only screen and (orientation:landscape){
-          #warning-message { display:none; }
+          div#warning-message { display:none; }
       }
+
+      div#about {display: none; margin:8px;}
 
       div#donate {text-align:center; font-size:16px; font-family:'whitrabt', monospace; line-height:22px; width:400px; display:none;}
       div#donate::selection {color: gold; background-color:#555;}
@@ -42,6 +44,51 @@
     <div id="warning-message">
         Rotate me! This website works best in landscape mode.
     </div>
+
+<div id="about">
+  <h1>BitcoinRain.io</h1>
+  <p>This website is a visualisation of the transactions and blocks being received by a bitcoin node.</p>
+  <!--
+  <p>The <a href="http://learnmeabitcoin.com/guide/nodes">node</a> is connected to other nodes on the <a href="http://learnmeabitcoin.com/guide/network">bitcoin network</a> and is receiving transactions from them:</p>
+  -->
+  <ul>
+  <li><strong style="color:#00729C;">Blue Raindrop</strong> = Transaction</li>
+  <li><strong style="color:#B700FF;">Purple Raindrop</strong> = Segwit Transaction</li>
+  </ul>
+  <p>New transactions this node receives enter the <strong>memory pool</strong>. Here they are held in the node's memory for up to 72 hours.</p>
+  <p>The node also recevies <strong>blocks</strong> every 10 minutes on average. A <a href="http://learnmeabitcoin.com/guide/blocks">block</a> takes transactions from the <a href="http://learnmeabitcoin.com/glossary/memory-pool">memory pool</a> and adds them them to the <a href="http://learnmeabitcoin.com/guide/blockchain">blockchain</a>.</p>
+  <h2 id="about-me">About Me</h2>
+  <p>This is my first attempt at real-time visualisation. I'm also currently working on <a href="http://learnmeabitcoin.com">learnmeabitcoin.com</a>, which is a website with <em>simple documentation</em> for bitcoin. It also has a rudimentary <a href="http://learnmeabitcoin.com/browser/">blockchain explorer</a>.</p>
+  <p>There are two things I like:</p>
+  <ul>
+  <li>Comments for improvements: <code style="font-size:16px; font-weight:bold; color:darkblue;">greg[at]learnmeabitcoin[dot]com</code> or <a href="https://twitter.com/in3rsha">Twitter</a></li>
+  <li>Donations for beer: <code style="font-size:16px; font-weight:bold; color:darkgreen;">1RainRzqJtJxHTngafpCejDLfYq2y4KBc</code> (donations are highlighted in the visualisation)</li>
+  </ul>
+  <h2 id="faq">FAQ:</h2>
+  <h3 id="what-is-this-website">What is this website?</h3>
+  <p>It is a real time visualisation of new transactions and blocks as they're passing across the bitcoin network.</p>
+  <h3 id="whats-the-use">What's the use?</h3>
+  <p>It's cool to watch bitcoin transactions as they're happening. You can see the current transaction rate, as well as how much money is being moved per second.</p>
+  <p>Personally, I use it to watch and wait for the next block to get mined.</p>
+  <h3 id="why-do-transactions-bounce-off-the-memory-pool">Why do transactions bounce off the memory pool?</h3>
+  <p>Because I thought it would look cool, so it doesn't symbolise anything. However, I did make transactions <em>bouncier</em> if they're moving a high quantity of bitcoins in a small number of bytes of <a href="http://learnmeabitcoin.com/glossary/transaction-data">transaction data</a> (i.e. more "efficient").</p>
+  <h3 id="wheres-the-code-for-this-website">Where's the code for this website?</h3>
+  <p>I haven't released it yet, but I'll send you a link if you're interested.</p>
+  <p>But to summarize:</p>
+  <ul>
+  <li>I'm using <a href="https://www.ruby-lang.org/en/">Ruby</a> to connect to my node in Switzerland to receive all the transactions and blocks it is relaying.</li>
+  <ul>
+  <li>I also send the node <a href="https://en.bitcoin.it/wiki/API_reference_%28JSON-RPC%29">RPC requests</a> to get extra information from it.</li>
+  </ul>
+  <li>I'm using <a href="https://github.com/joewalnes/websocketd">websocketd</a> turn this stream of data in to a WebSocket server.</li>
+  <li>I use Javascript in the browser to read from the websocket, and <a href="https://p5js.org/">p5.js</a> to create the visualisation.</li>
+  </ul>
+  <h3 id="credits">Credits</h3>
+  <ul>
+  <li>Thanks to <a href="https://www.youtube.com/user/shiffman">Daniel Shiffman</a> for the p5.js tutorials.</li>
+  <li>I found this simple <a href="https://www.webpagefx.com/web-design/color-picker/">color picker</a> particularly handy.</li>
+  </ul>
+</div>
 
     <div id="donate">1RainRzqJtJxHTngafpCejDLfYq2y4KBc</div>
   </body>

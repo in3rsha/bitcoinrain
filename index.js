@@ -1,3 +1,7 @@
+var myCanvas;
+var about;
+var about_active = false;
+
 // config
 var websocket_uri = "ws://bitcoinrain.io:8080"; // Connect to the websocket that proviedes a stream of tx, block, and mempool data
 var debug = false; // set this to true to show debug stats on the screen
@@ -70,8 +74,11 @@ function setup() {
     colorMode(HSB); // 360, 100, 100, 1
 
     // Canvas
-    var myCanvas = createCanvas(windowWidth, windowHeight);
+    myCanvas = createCanvas(windowWidth, windowHeight);
     myCanvas.parent('sketch'); // show the sketch in a specific div
+
+    // About
+    about = select("#about");
 
     // Font
     textFont(myFont);
@@ -229,6 +236,8 @@ function setup() {
 }
 
 function draw() {
+    // myCanvas.hide();
+
     // Redraw background constantly
     background(0, 0, bg); // Single Color Hue website background = 46
 
@@ -580,6 +589,18 @@ function touchStarted() { // touch for mobiles (will use mousePressed instead if
 }
 
 function keyPressed() {
+  if (keyCode === ESCAPE) {
+    if (about_active == false) {
+      myCanvas.hide();
+      about.show();
+      about_active = true;
+    } else {
+      myCanvas.show();
+      about.hide();
+      about_active = false;
+    }
+  }
+
   if (keyCode === ENTER) {
     show_values = !show_values;
   }
