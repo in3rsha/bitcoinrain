@@ -278,7 +278,11 @@ function draw() {
     text(tps + " tx/s", windowWidth/2, (windowHeight/2)+36);
 
     // btc/s
-    fill(0, 0, 59);
+    if (ball_dimension == 'value') {
+      fill(0, 0, 59);
+    } else {
+      fill(0, 0, 8);
+    }
     textSize(22);
     textAlign(RIGHT);
 
@@ -288,7 +292,11 @@ function draw() {
     text(currency_per_s + " " + currency_array[currency_select] + "/s", width - 10, mempool.y - 10);
 
     // kb/s
-    fill(0, 0, 8);
+    if (ball_dimension == 'size') {
+      fill(0, 0, 59);
+    } else {
+      fill(0, 0, 8);
+    }
     textSize(22);
     textAlign(LEFT);
     kb_per_s = (tx_total_size / 1000 / (millis() / 1000)).toFixed(2);

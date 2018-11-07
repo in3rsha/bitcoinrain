@@ -96,7 +96,7 @@ function Ball(data) {
         if (show_values === true) { // show_values is a global variable (controlled by ENTER)
           // Put size (kb) inside ball
           if (ball_dimension == 'size') { // ...only if it's big enough
-            fill(0); // black for bytes
+            fill(59); // grey
             textSize(this.label_size);
             textAlign(LEFT);
 
@@ -104,7 +104,7 @@ function Ball(data) {
           }
 
           if (ball_dimension == 'value') { // show_values is a global variable
-            fill(59); // grey for value
+            fill(59); // grey
             textSize(this.label_size);
             textAlign(LEFT);
             text(this.currency_values[currency_select].replace(/\d(?=(\d{3})+\.)/g, '$&,') + " " + currency_array[currency_select], this.x+(this.d/2)+6, this.y+4);
