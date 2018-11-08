@@ -48,6 +48,16 @@ verack = Bitcoin::Protocol::Message.new('verack') # "F9BEB4D9 76657261636b000000
 socket.write verack.binary
 puts "verack->"
 
+# A. Create a thread that sends pings to the node we're connected to (to try and keep connection alive better)
+Thread.new do
+  loop do
+    sleep 16 # send a ping every 16 seconds
+    ping = Bitcoin::Protocol::Message.new('ping', '0000000000000000') # ping message takes a 8 byte nonce of your choice
+    puts "threaded_ping->"
+    socket.write ping.binary
+  end
+end
+
 # 3. Receive Messages
 loop do
 
@@ -55,7 +65,7 @@ loop do
   puts "<-#{message.type}"
 
   # 4. Respond to pings (keeps connection alive)
-  if message.type == 'ping' # 70696E670000000000000000
+  if message.type == 'ping' # 70696E670000000000000000 (8 byte nonce)
     puts "pong->"
     pong = Bitcoin::Protocol::Message.new('pong', message.payload) # reply with ping's payload
     socket.write pong.binary
@@ -126,6 +136,11 @@ loop do
         clients.delete(client) # remove client from list because it has disconnected
       end
     end
+
+    if message.type == 'reject'
+      puts message.payload
+    end
+
   end
 
   # dummy blocks
