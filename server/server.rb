@@ -53,7 +53,7 @@ Thread.new do
   loop do
     sleep 16 # send a ping every 16 seconds
     ping = Bitcoin::Protocol::Message.new('ping', '0000000000000000') # ping message takes a 8 byte nonce of your choice
-    puts "threaded_ping->"
+    puts "threaded_ping-> " + Time.now.strftime("%Y-%m-%d %H:%M:%S")
     socket.write ping.binary
   end
 end
@@ -62,11 +62,11 @@ end
 loop do
 
   message = socket.gets
-  puts "<-#{message.type}"
+  puts "<-#{message.type} " + Time.now.strftime("%Y-%m-%d %H:%M:%S")
 
   # 4. Respond to pings (keeps connection alive)
   if message.type == 'ping' # 70696E670000000000000000 (8 byte nonce)
-    puts "pong->"
+    puts "pong-> " + Time.now.strftime("%Y-%m-%d %H:%M:%S")
     pong = Bitcoin::Protocol::Message.new('pong', message.payload) # reply with ping's payload
     socket.write pong.binary
   end
@@ -78,7 +78,7 @@ loop do
     message.payload.gsub!("02000000", "02000040") # MSG_WITNESS_BLOCK
     # https://github.com/bitcoin/bips/blob/master/bip-0144.mediawiki#relay
 
-    puts " getdata->"
+    puts " getdata-> " + Time.now.strftime("%Y-%m-%d %H:%M:%S")
     getdata = Bitcoin::Protocol::Message.new('getdata', message.payload)
     socket.write getdata.binary
 
