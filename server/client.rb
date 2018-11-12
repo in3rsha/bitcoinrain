@@ -10,7 +10,7 @@ STDOUT.sync = true
 
 # 0. Try connecting to stream.sock that server.rb is writing to
 begin
-  stream = UNIXSocket.new('stream.sock') # server.rb writes to this socket
+  stream = UNIXSocket.new('stream.sock') # stream.sock or stream-php/stream.sock - server.rb writes to this socket 
 rescue
   puts '{"type":"status","message":"fail"}' # sent a status message to websocket if can't connect
   exit # exit if problem

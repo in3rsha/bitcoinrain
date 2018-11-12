@@ -1,1 +1,1 @@
-websocketd --port=8080 --devconsole ./client.rb
+websocketd --port=8082 --devconsole ./client.rb
