@@ -92,6 +92,7 @@ loop do
         client.puts mempoolinfo  # Send an updated mempool count message too
       rescue
         clients.delete(client) # remove client from list because it has disconnected
+        client.close # close connection to client
       end
     end
   end
@@ -108,6 +109,7 @@ loop do
         client.puts json       # try writing to this client
       rescue
         clients.delete(client) # remove client from list because it has disconnected
+        client.close # close connection to client
       end
     end
   end
@@ -134,6 +136,7 @@ loop do
         # client.puts mempoolinfo  # Send an updated mempool count message too
       rescue
         clients.delete(client) # remove client from list because it has disconnected
+        client.close # close connection to client
       end
     end
 
