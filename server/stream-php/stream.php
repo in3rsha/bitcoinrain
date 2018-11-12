@@ -96,9 +96,8 @@ while (true) {
 			// parse the header
 			$magic = substr($buffer, 0, 8);
 			$command  = commandName(substr($buffer, 8, 24));
-			
-			var_dump($command);
-			
+			// var_dump($command);
+
 			$size = hexdec(swapEndian(substr($buffer, 32, 8)));
 			$checksum = substr($buffer, 40, 8);
 			// echo "$command \n";
@@ -125,15 +124,15 @@ while (true) {
 
 			if ($command == 'inv') {
 				echo "inv: \n";
-				
+
 				// [ ] ask for blocks as well as txs (similar to server.rb)
 				$reply = str_replace('01000000', '01000040', $payload);
 				$reply = str_replace('02000000', '02000040', $payload);
-				
+
 				// send "getdata" message (will reply with individual tx messages for each of them...)
 				$getdata = makeMessage('getdata', $reply, $testnet);
 				socket_send($socket, hex2bin($getdata), strlen($getdata) / 2, 0);
-			
+
 				// $inv = $payload;
 
 				// [varint] { [type][hash]... }
