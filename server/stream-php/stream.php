@@ -96,6 +96,9 @@ while (true) {
 			// parse the header
 			$magic = substr($buffer, 0, 8);
 			$command  = commandName(substr($buffer, 8, 24));
+			
+			var_dump($command);
+			
 			$size = hexdec(swapEndian(substr($buffer, 32, 8)));
 			$checksum = substr($buffer, 40, 8);
 			// echo "$command \n";
@@ -121,7 +124,17 @@ while (true) {
 			}
 
 			if ($command == 'inv') {
-				$inv = $payload;
+				echo "inv: \n";
+				
+				// [ ] ask for blocks as well as txs (similar to server.rb)
+				$reply = str_replace('01000000', '01000040', $payload);
+				$reply = str_replace('02000000', '02000040', $payload);
+				
+				// send "getdata" message (will reply with individual tx messages for each of them...)
+				$getdata = makeMessage('getdata', $reply, $testnet);
+				socket_send($socket, hex2bin($getdata), strlen($getdata) / 2, 0);
+			
+				// $inv = $payload;
 
 				// [varint] { [type][hash]... }
 
@@ -131,39 +144,39 @@ while (true) {
 					// https://github.com/bitcoin/bips/blob/master/bip-0144.mediawiki
 
 				// read the inv
-				list($full, $value, $len) = varInt($inv);
-				$inv = substr($inv, $len);
+				// list($full, $value, $len) = varInt($inv);
+				// $inv = substr($inv, $len);
 
 				// get an inventory array
-				$inventory = [];
-				for ($i=1; $i<=$value; $i++) {
-					$type = substr($inv, 0, 8);
-					$hash = substr($inv, 8, 64);
-					$inv = substr($inv, 72);
+				// $inventory = [];
+				// for ($i=1; $i<=$value; $i++) {
+				//	$type = substr($inv, 0, 8);
+				//	$hash = substr($inv, 8, 64);
+				//	$inv = substr($inv, 72);
 
-					if (strlen($type) == 8 && strlen($hash) == 64) { // check we got full type and hash before creating array
-						$inventory[$hash] = $type;
-					}
-				}
+				// 	if (strlen($type) == 8 && strlen($hash) == 64) { // check we got full type and hash before creating array
+				//		$inventory[$hash] = $type;
+				//	}
+				//}
 
-				echo "\ninv: ($i) \n";
+				// echo "\ninv: \n";
 
 				// if we've got a tx inv type...
-				if (in_array('01000000', $inventory)) {
+				// if (in_array('01000000', $inventory)) {
 
-					// Create the getdata reply (tx types only, reply with segwit flag type)
-					$invreply = toVarInt(count($inventory)).'';
-					foreach ($inventory as $hash => $type) {
-						if ($type = '01000000') { // a tx inv
-							$invreply .= '01000040'.$hash;
-						}
-					}
+					// // Create the getdata reply (tx types only, reply with segwit flag type)
+					// $invreply = toVarInt(count($inventory)).'';
+					// foreach ($inventory as $hash => $type) {
+					// 	if ($type = '01000000') { // a tx inv
+					//		$invreply .= '01000040'.$hash;
+					//	}
+					// }
 
 					// send "getdata" message (will reply with individual tx messages for each of them...)
-					$getdata = makeMessage('getdata', $invreply, $testnet);
-					socket_send($socket, hex2bin($getdata), strlen($getdata) / 2, 0);
+					// $getdata = makeMessage('getdata', $reply, $testnet);
+					// socket_send($socket, hex2bin($getdata), strlen($getdata) / 2, 0);
 
-				}
+				// }
 
 			}
 
@@ -222,12 +235,10 @@ while (true) {
 				// Convert to json
 				$json = json_encode($block, true);
 
+				// write message to every connected client
 				foreach ($clients as $client) {
 					socket_write($client, $json."\n");
 				}
-
-				var_dump($json);
-				exit;
 
 			}
 
