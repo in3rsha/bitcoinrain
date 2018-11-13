@@ -3,17 +3,17 @@
 $donation_address = "1RainRzqJtJxHTngafpCejDLfYq2y4KBc"; // can set to something simple;
 
 // General Functions
-require_once '../decoders/lib/basic.php'; // ascii2hex
-require_once '../decoders/lib/tx.php';    // decode tx
-require_once '../decoders/lib/block.php'; // decode block
+require_once 'lib/basic.php'; // ascii2hex
+require_once 'lib/tx.php';    // decode tx
+require_once 'lib/block.php'; // decode block
 require_once 'functions.php'; // making node messages
 
 // --------
 // SETTINGS
 // --------
-$version	= 70014; // 60002 // 70014
-$node		  = array('46.19.137.74', 8333); // node you want to connect to (8333=mainnet, 18333=testnet)
-$local		= array('127.0.0.1', 8880); // our ip and port
+$version  = 70014; // 60002 // 70014
+$node	  = array('46.19.137.74', 8333); // node you want to connect to (8333=mainnet, 18333=testnet)
+$local	  = array('127.0.0.1', 8880); // our ip and port
 $testnet  = false;
 
 list($node_ip, $node_port) = $node;

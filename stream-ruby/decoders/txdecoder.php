@@ -1,5 +1,5 @@
 <?php
-require_once 'lib/tx.php';
+require_once '../stream-php/lib/tx.php';
 
 $donation_address = "1RainRzqJtJxHTngafpCejDLfYq2y4KBc"; // can set to something simple;
 
