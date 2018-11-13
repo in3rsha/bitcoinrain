@@ -2,6 +2,7 @@
 
 name: bitcoinrain
 root: ~/inersha/projects/bitcoinrain/stream-php/
+#root: ~/inersha/projects/bitcoinrain/stream-ruby/
 
 # Optional tmux socket
 # socket_name: foo
@@ -46,3 +47,8 @@ windows:
   - server: php stream.php
   - websocketd: bash websocketd.sh
   - client: ruby client.rb
+
+#windows:
+#  - server: ruby server.rb
+#  - websocketd: bash websocketd.sh
+#  - client: ruby client.rb
