@@ -127,7 +127,7 @@ while (true) {
 
 				// [ ] ask for blocks as well as txs (similar to server.rb)
 				$reply = str_replace('01000000', '01000040', $payload);
-				$reply = str_replace('02000000', '02000040', $payload);
+				$reply = str_replace('02000000', '02000040', $reply);
 
 				// send "getdata" message (will reply with individual tx messages for each of them...)
 				$getdata = makeMessage('getdata', $reply, $testnet);
