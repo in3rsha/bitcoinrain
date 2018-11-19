@@ -60,6 +60,23 @@ var currency_sign_array = []; // e.g. $, £
 // Sound
 var sound;
 
+// Waiting for Transactions
+function Waiting() {
+  this.l = 44;
+
+  this.update = function() {
+    // this.l = map(millis(), 0, 10000, 44, 100, true); // go from dark to bright over the course of a 10 seconds
+    // console.log(this.l);
+  }
+
+  this.show = function() {
+    textAlign(CENTER);
+    textSize(24);
+    fill(this.l);
+    text("Waiting For New Transactions", windowWidth/2, 28);
+  }
+}
+
 function preload() { // preload stuff (before setup() and all other p5 stuff)
     // Sound
     // sound = loadSound("droplet.mp3");
@@ -107,6 +124,9 @@ function setup() {
 
     // Create Donations box
     donations = new Donations();
+
+    // Waiting For Transactions
+    waiting = new Waiting();
 
     // Attach callback function to websocket event in the setup...
     var ws = new WebSocket(websocket_uri);
@@ -380,6 +400,12 @@ function draw() {
     // Donations
     donations.show();
     donations.update();
+
+    // Waiting
+    if (tx_count == 0) { // show note while we're waiting for the first transaction to come through
+      waiting.show();
+      waiting.update();
+    }
 
     // Update Time
     unixtime = Math.floor(Date.now() / 1000);
