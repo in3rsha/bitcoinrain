@@ -1,5 +1,5 @@
 <?php
-require_once '../stream-php/lib/block.php';
+require_once '../server-php/lib/block.php';
 
 while (true) {
     $gets = trim(fgets(STDIN)); // STDIN   - blocks as it waits for input
