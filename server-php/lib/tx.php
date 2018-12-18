@@ -2,7 +2,7 @@
 include_once 'basic.php';
 include_once 'script.php';
 
-function decodeRawTransaction($data) {
+function decoderawtransaction($data) {
 
     // save the original
     $raw = $data;

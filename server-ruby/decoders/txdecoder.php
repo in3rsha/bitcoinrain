@@ -10,7 +10,7 @@ while (true) {
 
     // Wait for some data and decode it
     $gets = trim(fgets(STDIN)); // STDIN   - blocks as it waits for input
-    $decoded = decodeRawTransaction($gets); // decode the data
+    $decoded = decoderawtransaction($gets); // decode the data
 
     // Check for donations
     $donation = false;

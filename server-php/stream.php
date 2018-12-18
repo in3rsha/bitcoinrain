@@ -183,7 +183,7 @@ while (true) {
 				echo '<-tx'.PHP_EOL;
 
 				// decode tx
-				$decoded = decodeRawTransaction($payload);
+				$decoded = decoderawtransaction($payload);
 
 				// set type (sketch expects it to identify different messages)
 				$decoded['type'] = 'tx';
