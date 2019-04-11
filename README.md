@@ -2,11 +2,11 @@
 
 A **visualisation** of live bitcoin transactions as rain.
 
-This is my first attempt at making a live visualisation website using **Websockets**. I'm connecting to a running [Bitcoin Core](https://bitcoin.org/en/bitcoin-core/) node to get recently broadcast bitcoin transactions, using [websocketd](https://github.com/joewalnes/websocketd) to turn that data in to websocket server, and using [p5.js](https://p5js.org/) to visualise that data on a webpage.
+This is my first attempt at making a live visualisation website using **Websockets**. I'm connecting to a running [Bitcoin Core](https://bitcoin.org/en/bitcoin-core/) node to get recently broadcast bitcoin transactions, then running [websocketd](https://github.com/joewalnes/websocketd) to use that data in a websocket server, and using [p5.js](https://p5js.org/) to visualise the data on a webpage.
 
 You can check out the live transaction stream websocket server at `http://bitcoinrain.io:8082` (click the tick), or connect to it directly from your program at `ws://bitcoinrain.io:8082`.
 
-![](docs/screenshot.png)
+[![](docs/screenshot.png)](http://bitcoinrain.io)
 
 
 ## Dependencies
@@ -71,28 +71,32 @@ http {
 }
 ```
 
+Then reload nginx to use the new configuration with:
+
+```
+sudo nginx -s reload
+```
+
 The website should now be working at `http://localhost:80`, although it will be receiving data from my remote websocket hosted at `ws://bitcoinrain.io:8082`.
 
 If you want to _run your own local websocket server_, you will need the do the following:
 
 ### 2. Connect to a Bitcoin Node
 
-Run `/server-ruby/server.rb`, which connects to a Bitcoin Node so that it can get live transaction data:
+Run `/server-ruby/server.rb`, which connects to a Bitcoin Node to get the latest bitcoin transactions:
 
 ```
-cd ~/inersha/projects/bitcoinrain/server-rb/
-ruby server.rb
+ruby server-rb/server.rb
 ```
 
-_**NOTE:** Don't forget to change the IP of the node you want to connect to by changing the the `socket` variable inside the `server.rb` script._
+_**NOTE:** Don't forget to change the IP of the bitcoin node you want to connect to by changing the the `socket` variable inside `server.rb`._
 
 ### 3. Websocket Server
 
-Finally, you just need to run `websocketd` to start the websocket server. This will spawns a `/server-ruby/client.rb` process every time a connection is made to the websocket server at `ws://localhost.io:8082` (so every time someone visits the website):
+Finally, you need to run `websocketd` to start the websocket server. This will **spawn a `/server-ruby/client.rb` process every time a connection is made to the websocket** server at `ws://localhost.io:8082` (so every time someone visits the website):
 
 ```
-cd ~/inersha/projects/bitcoinrain/server-rb/
-bash websocketd.sh
+bash server-rb/websocketd.sh
 ```
 
 _**NOTE:** You can change the port the websocket is running on by changing the `--port` option in `websocketd.sh`._
@@ -105,7 +109,7 @@ _**NOTE:** You should also change the `websocket_uri` variable in `index.js` fro
 
 **1. Webserver** - This serves the HTML and Javascript files for the website. I like nginx, but I'm sure you can use any webserver. The javascript code in `/index.js` wants to connect to a websocket at `ws://localhost:8082` for receiving transaction data.
 
-**2.** `/server-ruby/server.rb` - Connects to a bitcoin node so that it can receive the latest transactions from it. It then uses the PHP scripts in `/decoders` (because I already had transaction decoders written in PHP) to decode the raw transaction data in to JSON, and writes the decoded transaction JSON data to a UNIX socket file `stream.sock`.
+**2. `/server-ruby/server.rb`** - Connects to a bitcoin node so that it can receive the latest transactions from it. It then uses the PHP scripts in `/decoders` (because I already had transaction decoders written in PHP) to decode the raw transaction data in to JSON, and writes the decoded transaction JSON data to a UNIX socket file `stream.sock`.
 
 **3. `/server-ruby/client.rb`** - Spawned when a connection is made to the websocket at `ws://localhost.io:8082` (courtesy of [websocketd](https://github.com/joewalnes/websocketd)). This script connects to `/server-ruby/stream.sock`, and reads all the data that is written to it by `/server-ruby/server.rb`.
 
