@@ -6,6 +6,8 @@ This is my first attempt at making a live visualisation website using **Websocke
 
 You can check out the live transaction stream websocket server at `http://bitcoinrain.io:8082` (click the tick), or connect to it directly from your program at `ws://bitcoinrain.io:8082`.
 
+![](docs/screenshot.png)
+
 
 ## Dependencies
 
@@ -101,13 +103,13 @@ _**NOTE:** You should also change the `websocket_uri` variable in `index.js` fro
 
 ![](docs/architecture.png)
 
-**1.** Webserver - This serves the HTML and Javascript files for the website. I like nginx, but I'm sure you can use any webserver. The javascript code in `/index.js` wants to connect to a websocket at `ws://localhost:8082` for receiving transaction data.
+**1. Webserver** - This serves the HTML and Javascript files for the website. I like nginx, but I'm sure you can use any webserver. The javascript code in `/index.js` wants to connect to a websocket at `ws://localhost:8082` for receiving transaction data.
 
-**2.** The `/server-ruby/server.rb` script connects to a bitcoin node so that it can receive the latest transactions from it. It then uses the PHP scripts in `/decoders` (because I already had transaction decoders written in PHP) to decode the raw transaction data in to JSON, and writes the decoded transaction JSON data to a UNIX socket file `stream.sock`.
+**2.** `/server-ruby/server.rb` - Connects to a bitcoin node so that it can receive the latest transactions from it. It then uses the PHP scripts in `/decoders` (because I already had transaction decoders written in PHP) to decode the raw transaction data in to JSON, and writes the decoded transaction JSON data to a UNIX socket file `stream.sock`.
 
-**3.** The `/server-ruby/client.rb` script is spawned when a connection is made to the websocket at `ws://localhost.io:8082` (courtesy of **websocketd**). This script simply connects to `/server-ruby/stream.sock` and reads all the data that is written to it by `/server-ruby/server.rb`. The `client.rb` is just a lightweight process that can provide data for the websocket, which is more efficient than having websocketd spawn a new `/server-ruby/server.rb` process every time someone connects to the websocket.
+**3. `/server-ruby/client.rb`** - Spawned when a connection is made to the websocket at `ws://localhost.io:8082` (courtesy of [websocketd](https://github.com/joewalnes/websocketd)). This script connects to `/server-ruby/stream.sock`, and reads all the data that is written to it by `/server-ruby/server.rb`.
 
-In other words, `/server-ruby/server.rb` is the single source of data, and `/server-ruby/client.rb` is a lightweight processes that is spawned to read from it.
+In other words, `/server-ruby/server.rb` is the single source of data, and `/server-ruby/client.rb` is a lightweight process that is spawned by _websocketd_ to read from it.
 
 ### Notes
 
@@ -116,7 +118,7 @@ In other words, `/server-ruby/server.rb` is the single source of data, and `/ser
 
 ```
 php server-php/server.php
-bash sevver-php/websocketd.sh
+bash server-php/websocketd.sh
 ```
 
 ## Thanks
