@@ -1,12 +1,16 @@
 # BitcoinRain.io
 
-A **visualisation** of live bitcoin transactions as rain.
-
-This is my first attempt at making a live visualisation website using **Websockets**. I'm connecting to a running [Bitcoin Core](https://bitcoin.org/en/bitcoin-core/) node to get recently broadcast bitcoin transactions, then running [websocketd](https://github.com/joewalnes/websocketd) to use that data in a websocket server, and using [p5.js](https://p5js.org/) to visualise the data on a webpage.
+A **visualisation** of live bitcoin transactions as rain. Each raindrop is a _realtime bitcoin transaction_.
 
 You can check out the live transaction stream websocket server at `http://bitcoinrain.io:8082` (click the tick), or connect to it directly from your program at `ws://bitcoinrain.io:8082`.
 
 [![](docs/screenshot.png)](http://bitcoinrain.io)
+
+## About
+
+This is my first attempt at making a realtime visualisation website using **Websockets**.
+
+I'm connecting to a running [Bitcoin Core](https://bitcoin.org/en/bitcoin-core/) node to get recently broadcast bitcoin transactions, then running [websocketd](https://github.com/joewalnes/websocketd) to use that data in a websocket server, and using [p5.js](https://p5js.org/) to visualise the data on a webpage.
 
 
 ## Dependencies
@@ -128,4 +132,5 @@ bash server-php/websocketd.sh
 ## Thanks
 
 * [Daniel Shiffman](https://www.youtube.com/user/shiffman) taught me everything I know about using [p5.js](https://p5js.org/). An amazing teacher who makes it easy to learn about programming in a fun way.
-* [Joe Walnes](https://github.com/joewalnes) makes creating websocket servers easy with [websocketd](https://github.com/joewalnes/websocketd). His tool allows you to write a program in any language and use it's STDOUT as a websocket server.
+* [Joe Walnes](https://github.com/joewalnes) makes creating websocket servers easy with [websocketd](https://github.com/joewalnes/websocketd). His tool allows you to write a program in any language and use it's STDOUT as a websocket server. I **highly recommend** trying it if you're planning on using websockets in your next project.
+* [BitListen.com](https://www.bitlisten.com/) was an inspiration in my decision to make a visualisation of live bitcoin transactions. I believe this was one of the first websites of its type.
