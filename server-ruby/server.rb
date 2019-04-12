@@ -2,6 +2,9 @@ require 'socket'
 require_relative 'lib/bitcoin.rb'
 require_relative 'requests/getmempoolinfo.rb' # Get an up to date mempool count after new block arrives
 
+# Config
+bitcoin_node='46.19.137.74' # the IP of the bitcoin node you want to connect to (to get live transaction and block data from)
+
 # A. Create socket for clients to read from
 File.unlink('stream.sock') # delete socket file if it already exists (otherwise error)
 clientsocket = UNIXServer.new('stream.sock')
@@ -26,7 +29,7 @@ blockdecoder = IO.popen("php decoders/blockdecoder.php", "r+")
 
 # 1. Connect to a bitcoin server
 puts "Connecting to the internets!"
-socket = Bitcoin.connect('46.19.137.74') # TCPSocket
+socket = Bitcoin.connect(bitcoin_node) # TCPSocket
 puts "Welcome to the Bitcoin Network: #{socket.inspect}"
 
 # 2. Handshake (also made convenience function `socket.handshake` if you like)
