@@ -165,4 +165,4 @@ bash websocketd.sh
 
 * [Daniel Shiffman](https://www.youtube.com/user/shiffman) taught me everything I know about using [p5.js](https://p5js.org/). An amazing teacher who makes it easy to learn about programming in a fun way.
 * [Joe Walnes](https://github.com/joewalnes) makes creating websocket servers easy with [websocketd](https://github.com/joewalnes/websocketd). His tool allows you to write a program in any language and use it's STDOUT as a websocket server. I **highly recommend** trying it if you're planning on using websockets in your next project.
-* [BitListen.com](https://www.bitlisten.com/) was an inspiration in my decision to make a visualisation of live bitcoin transactions. I believe this was one of the first websites of its type.
+* [BitListen.com](https://www.bitlisten.com/) (created by [Max Laumeister](https://www.maxlaumeister.com/)) was an inspiration in my decision to make a visualisation of live bitcoin transactions.
