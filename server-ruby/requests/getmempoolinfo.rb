@@ -11,7 +11,7 @@ require 'json'
 
 # Get mempool info from the same node we're connected to using learnmeabitcoin.com HTTP API
 def getmempoolinfo
-  open("http://learnmeabitcoin.com/api/getmempoolinfo.php") do |f|
+  open("https://learnmeabitcoin.com/api/getmempoolinfo.php") do |f|
     data = f.read            # read the page contents (a json result from the RPC request the page returns)
     hash = JSON.parse(data)  # convert json data to a ruby hash
 

@@ -3,7 +3,7 @@ require 'json'
 
 # Get BTC prices from learnmeabitcoin.com HTTP API
 def getprices
-  open("http://learnmeabitcoin.com/api/btc.php") do |f|
+  open("https://learnmeabitcoin.com/api/btc.php") do |f|
     # Create hash of "type":"prices"
     hash = Hash.new();
     hash["type"] = "prices"
