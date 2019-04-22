@@ -1,0 +1,4 @@
+<?php
+
+define("BITCOIN_USER", "username"); // ~/.bitcoin/bitcoin.conf rpcuser
+define("BITCOIN_PASS", "password"); // ~/.bitcoin/bitcoin.conf rpcpassword
