@@ -1,13 +1,15 @@
 <?php
 
+// [ ] WARNING: Bitcoin ZMQ will send you _all_ the transactions in a block when a block arrives, not just new mempool arrivals.
+
 $donation_address = "1RainRzqJtJxHTngafpCejDLfYq2y4KBc"; // can set to something simple;
 
 // General Functions
-require_once 'lib/easybitcoin.php'; // bitcoin json-rpc (getmempoolinfo)
-require_once 'lib/basic.php'; // ascii2hex
-require_once 'lib/tx.php';    // decode tx
-require_once 'lib/block.php'; // decode block
-require_once 'functions.php'; // making node messages
+require_once '../lib/easybitcoin.php'; // bitcoin json-rpc (getmempoolinfo)
+require_once '../lib/basic.php'; // ascii2hex
+require_once '../lib/tx.php';    // decode tx
+require_once '../lib/block.php'; // decode block
+require_once '../functions.php'; // making node messages
 require_once 'config.php';    // bitcoin user:pass for json-rpc
 
 // --------
@@ -60,7 +62,21 @@ while (true) {
 	// Unix Socket - Accept New Clients
 	$newclient = socket_accept($unix); // keep trying to accept any new clients
 	if ($newclient) {
-		$clients[] = $newclient; // add new client to array
+		// 1. Send starting mempool size (using JSON-RPC request to local bitcoin node)
+		$mempool = $bitcoind->getmempoolinfo();
+		$mempoolmsg = ["type" => "mempool", "count" => $mempool["size"], "size" => $mempool["bytes"]];
+		socket_write($newclient, json_encode($mempoolmsg, true).PHP_EOL);
+
+		// 2. Sent current bitcoin price (using API from learnmeabitcoin.com)
+		$prices = file_get_contents("https://learnmeabitcoin.com/api/btc.php");
+		$prices = json_decode($prices, true); // convert all numbers from string to integers (because sketch wants it)
+		$prices = str_replace(',', '', $prices); // remove commas from number strings
+		$prices = array_map("floatval", $prices); // convert number string to float
+		$prices["type"] = "prices"; // add message type
+		socket_write($newclient, json_encode($prices, true).PHP_EOL);
+
+		// 3. Add new client to array (list of connected clients that we will send data to)
+		$clients[] = $newclient;
 	}
 
 	// Unix Socket - Remove Disconnected Clients
@@ -85,12 +101,10 @@ while (true) {
 
 		if ($txsaddress == "rawtx") { // If the message topic is "rawtx"
 
-			//var_dump($address);
-
 			// See if message is in multiple parts
 			$more = $txs->getSockOpt(ZMQ::SOCKOPT_RCVMORE);
 
-			// Get message
+			// Get message (the raw transaction data)
 			if ($more) {
 				$contents = $txs->recv(); // contents
 			}
@@ -103,18 +117,18 @@ while (true) {
 			// decode tx
 			$decoded = decoderawtransaction($payload);
 
-			// set type (sketch expects it to identify different messages)
+			// set type inside the message (sketch expects it to identify different messages)
 			$decoded['type'] = 'tx';
 
 			// check for donations
-		  $donation = false;
-		  foreach($decoded['vout'] as $vout) {
-		    $addresses = $vout['scriptPubKey']['addresses']; // check each vout.scriptPubKey.addresses field
-		    if (strpos($addresses, $donation_address) !== false) { // check if it contains my donation address
-		      $donation = true; // add true donation field to the tx message
-		    }
-		  }
-		  $decoded['donation'] = $donation; // add donation:true type to message
+		  	$donation = false;
+		  	foreach($decoded['vout'] as $vout) {
+		    	$addresses = $vout['scriptPubKey']['addresses']; // check each vout.scriptPubKey.addresses field
+		    	if (strpos($addresses, $donation_address) !== false) { // check if it contains my donation address
+		      		$donation = true; // add true donation field to the tx message
+		    	}
+		  	}
+		  	$decoded['donation'] = $donation; // add donation:true type to message
 
 			// convert to json
 			$json = json_encode($decoded);
@@ -131,6 +145,8 @@ while (true) {
 	// ------
 	// Blocks
 	// ------
+
+	// [ ] WARNING: ZMQ will send you _all_ the transactions in a block when a block arrives, not just new mempool arrivals.
 
 	// Get message
 	$blocksaddress = $blocks->recv(ZMQ::MODE_DONTWAIT); // Do not block (first message is the topic)
