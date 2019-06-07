@@ -50,21 +50,33 @@ $clients = [];
 // -----------------
 
 // i. Create Version Message (needs to be sent to node you want to connect to)
-echo "Connect\n-------\n";
-$payload = makeVersionPayload($version, $node_ip, $node_port, $local_ip, $local_port);
-$message = makeMessage('version', $payload, $testnet);
-$message_size = strlen($message) / 2; // the size of the message (in bytes) being sent
+function connect($version, $node_ip, $node_port, $local_ip, $local_port, $testnet) {
+	echo "Connect\n-------\n";
+	$payload = makeVersionPayload($version, $node_ip, $node_port, $local_ip, $local_port);
+	$message = makeMessage('version', $payload, $testnet);
+	$message_size = strlen($message) / 2; // the size of the message (in bytes) being sent
 
-echo "Connecting to $node_ip...\n";
-// ii. Connect to socket and send version message
-$socket = socket_create(AF_INET, SOCK_STREAM, 6); socketerror(); // IPv4, TCP uses this type, TCP protocol
-socket_connect($socket, $node_ip, $node_port);
-echo "Sending version message...\n\n";
-socket_send($socket, hex2bin($message), $message_size, 0); // don't forget to send message in binary
+	echo "Connecting to $node_ip...\n";
+	// ii. Connect to socket and send version message
+	$socket = socket_create(AF_INET, SOCK_STREAM, 6); socketerror(); // IPv4, TCP uses this type, TCP protocol
+	socket_connect($socket, $node_ip, $node_port);
+	echo "Sending version message...\n\n";
+	socket_send($socket, hex2bin($message), $message_size, 0); // don't forget to send message in binary
+
+	return $socket;
+}
 
 // iii. Keep receiving data (inv messages) from the node we just connected to
+$connected = false;
+$socket = NULL;
+$lastinv = NULL;
 $buffer = '';
 while (true) {
+
+	if ($connected == false) {
+		$socket = connect($version, $node_ip, $node_port, $local_ip, $local_port, $testnet);
+		$connected = true;
+	}
 
 	// Unix Socket - Accept New Clients
 	$newclient = socket_accept($unix); // keep trying to accept any new clients
@@ -132,6 +144,9 @@ while (true) {
 				// send "getdata" message (will reply with individual tx messages for each of them...)
 				$getdata = makeMessage('getdata', $reply, $testnet);
 				socket_send($socket, hex2bin($getdata), strlen($getdata) / 2, 0);
+
+				// keep track of last message received
+				$lastinv = time();
 
 				// $inv = $payload;
 
@@ -261,6 +276,17 @@ while (true) {
 	// tiny sleep to prevent looping insanely fast and using up 100% CPU power on one core
 	usleep(10000); // 1/100th of a second
 	echo '.';
+
+	// ---------
+	// RECONNECT after 2 minutes of not receiving an inv message
+	// ---------
+	if (isset($lastinv)) {
+		if ((time() - $lastinv) > 120) {
+			echo "\nRECONNECTING!\n";
+			$lastinv = NULL; // unset lastinv message so we dont keep trying to reconnect
+			$connected = false; // we are no longer connected, so connect on next loop...
+		}
+	}
 
 }// main
 
