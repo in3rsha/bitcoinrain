@@ -12,7 +12,8 @@ require_once 'functions.php'; // making node messages
 // SETTINGS
 // --------
 $version  = 70014; // 60002 // 70014
-$node	  = array('46.19.137.74', 8333); // node you want to connect to (8333=mainnet, 18333=testnet)
+//$node	  = array('46.19.137.74', 8333); // node you want to connect to (8333=mainnet, 18333=testnet)
+$node	  = array('85.119.83.25', 8333);
 $local	  = array('127.0.0.1', 8880); // our ip and port
 $testnet  = false;
 
