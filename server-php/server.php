@@ -317,7 +317,7 @@ while (true) {
 			@socket_send($socket, hex2bin($ping), strlen($ping) / 2, 0); // suppress errors
 
 			$pings[$nonce] = time(); // add to pings array
-			$nextping = time() + 7; // set next ping to 30 secs in the future
+			$nextping = time() + 30; // set next ping to 30 secs in the future
 
 			echo "\nping-> $nonce\n";
 		}
