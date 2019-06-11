@@ -112,6 +112,7 @@ function commandName($data) { // http://www.asciitohex.com/
 	if     ($data == '76657273696f6e0000000000') { $command = 'version'; }
 	elseif ($data == '76657261636b000000000000') { $command = 'verack'; }
 	elseif ($data == '70696e670000000000000000') { $command = 'ping'; }
+	elseif ($data == '706f6e670000000000000000') { $command = 'pong'; }
 	elseif ($data == '616464720000000000000000') { $command = 'addr'; }
 	elseif ($data == '676574686561646572730000') { $command = 'getheaders'; }
 	elseif ($data == '696e76000000000000000000') { $command = 'inv'; }
